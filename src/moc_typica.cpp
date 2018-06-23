@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'typica.cpp'
 **
-** Created by: The Qt Meta Object Compiler version 63 (Qt 4.8.7)
+** Created by: The Qt Meta Object Compiler version 63 (Qt 4.8.6)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -9,7 +9,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'typica.cpp' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 63
-#error "This file was generated using the moc from 4.8.7. It"
+#error "This file was generated using the moc from 4.8.6. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -1716,7 +1716,7 @@ static const uint qt_meta_data_AnnotationButton[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   14, // methods
+       8,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -1732,6 +1732,8 @@ static const uint qt_meta_data_AnnotationButton[] = {
      167,  150,   17,   17, 0x0a,
      192,   17,   17,   17, 0x0a,
      203,   17,   17,   17, 0x0a,
+     216,   17,   17,   17, 0x0a,
+     229,   17,   17,   17, 0x0a,
 
        0        // eod
 };
@@ -1742,7 +1744,7 @@ static const char qt_meta_stringdata_AnnotationButton[] = {
     "setAnnotation(QString)\0tempcolumn\0"
     "setTemperatureColumn(int)\0annotationcolumn\0"
     "setAnnotationColumn(int)\0annotate()\0"
-    "resetCount()\0"
+    "resetCount()\0resetBatch()\0incrementBatch()\0"
 };
 
 void AnnotationButton::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -1757,6 +1759,8 @@ void AnnotationButton::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
         case 3: _t->setAnnotationColumn((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 4: _t->annotate(); break;
         case 5: _t->resetCount(); break;
+        case 6: _t->resetBatch(); break;
+        case 7: _t->incrementBatch(); break;
         default: ;
         }
     }
@@ -1794,9 +1798,9 @@ int AnnotationButton::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 8)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 8;
     }
     return _id;
 }

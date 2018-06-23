@@ -10795,7 +10795,8 @@ string that can be incremented between batches.
 int batchReplace = noteTemplate.indexOf("%A");
 if(batchReplace >= 0)
 {
-	note = noteTemplate.replace(batchReplace, 2, batch);
+	QString temp = noteTemplate;
+	note = temp.replace(batchReplace, 2, batch);
 }
 else
 {
@@ -10814,6 +10815,7 @@ void AnnotationButton::resetCount()
 void AnnotationButton::resetBatch()
 {
 	batch = "A";
+	@<Replace batch holder in template@>@;
 }
 
 @ The batch sequence starts at A through Z, then proceeds to AA through AZ
@@ -18443,6 +18445,7 @@ ReconfigurableAnnotationButtonConfWidget::ReconfigurableAnnotationButtonConfWidg
     QFormLayout *layout = new QFormLayout;
     QLineEdit *buttonTextEdit = new QLineEdit;
     QLineEdit *annotationTextEdit = new QLineEdit;
+	annotationTextEdit->setText("%A-%1");
     layout->addRow(tr("Button Text:"), buttonTextEdit);
     layout->addRow(tr("Annotation Text:"), annotationTextEdit);
     @<Get device configuration data for current node@>@;

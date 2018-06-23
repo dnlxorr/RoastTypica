@@ -552,6 +552,8 @@
 						setParam.windowTitle = TTR("basicWindow", "Typica - Set Sample Parameters");
 						setParam.button = button;
 					});
+					stop.clicked.connect(button.incrementBatch);
+					stop.clicked.connect(button.resetCount);
 				}
 				else if(driverReference.driver == "annotationspinbox")
 				{
