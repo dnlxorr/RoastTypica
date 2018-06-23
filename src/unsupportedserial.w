@@ -231,6 +231,9 @@ UnsupportedDeviceChannelConfWidget::UnsupportedDeviceChannelConfWidget(DeviceTre
 			}
 		}
 	}
+	updateColumnName(columnName->text());
+	updateHidden(hideSeries->isChecked());
+	updateConfiguration();
 	connect(columnName, SIGNAL(textEdited(QString)), this, SLOT(updateColumnName(QString)));
 	connect(hideSeries, SIGNAL(toggled(bool)), this, SLOT(updateHidden(bool)));
 	connect(channelSettingsModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)),
