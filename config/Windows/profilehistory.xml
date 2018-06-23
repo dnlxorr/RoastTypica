@@ -88,7 +88,11 @@
 						log.newAnnotation(annotation, i, nc);
 					}
 				});
+				graph.updatesEnabled = false;
+				log.updatesEnabled = false;
 				input.input();
+				log.updatesEnabled = true;
+				graph.updatesEnabled = true;
 			}
 			query = query.invalidate();
 		};
