@@ -10711,10 +10711,12 @@ be applied to the roasting log quickly. This is the purpose of the
 class AnnotationButton : public QPushButton@/
 {@t\1@>@/
     Q_OBJECT@;
+	QString noteTemplate;
     QString note;
     int tc;
     int ac;
     int count;
+	QString batch;
     public:@/
         AnnotationButton(const QString &text, QWidget *parent = NULL);@/
     @t\4@>public slots@t\kern-3pt@>:@/
@@ -10723,6 +10725,8 @@ class AnnotationButton : public QPushButton@/
         void setAnnotationColumn(int annotationcolumn);
         void annotate();
         void resetCount();
+		void resetBatch();
+		void incrementBatch();
     signals:@/
         void annotation(QString annotation, int tempcolumn,
                         int notecolumn);@t\2@>@/
@@ -10735,7 +10739,8 @@ button should exhibit when clicked.
 
 @<AnnotationButton Implementation@>=
 AnnotationButton::AnnotationButton(const QString &text, QWidget *parent) :
-    QPushButton(text, parent), note(""), tc(0), ac(0), count(0)@/
+    QPushButton(text, parent), noteTemplate(""), note(""), tc(0), ac(0),
+	count(0), batch("A")@/
 {
     connect(this, SIGNAL(clicked()), this, SLOT(annotate()));
 }
@@ -10779,16 +10784,64 @@ void AnnotationButton::setAnnotationColumn(int annotationcolumn)
 
 void AnnotationButton::setAnnotation(const QString &annotation)
 {
-    note = annotation;
+    noteTemplate = annotation;
+	@<Replace batch holder in template@>@;
 }
 
-@ Finally, in the case of counting annotations, there should be a way to reset
-the number used in the annotation.
+@ Note templates that contain "%A" should have that replaced with a
+string that can be incremented between batches.
+
+@<Replace batch holder in template@>=
+int batchReplace = noteTemplate.indexOf("%A");
+if(batchReplace >= 0)
+{
+	note = noteTemplate.replace(batchReplace, 2, batch);
+}
+else
+{
+	note = noteTemplate;
+}
+
+@ In the case of counting annotations, there should be a way to reset
+the number and batch used in the annotation.
 
 @<AnnotationButton Implementation@>=
 void AnnotationButton::resetCount()
 {
     count = 0;
+}
+
+void AnnotationButton::resetBatch()
+{
+	batch = "A";
+}
+
+@ The batch sequence starts at A through Z, then proceeds to AA through AZ
+and so on.
+
+@<AnnotationButton Implementation@>=
+void AnnotationButton::incrementBatch()
+{
+	int position = batch.size() - 1;
+increment:
+	if(batch[position] != 'Z')
+	{
+		batch[position] = batch[position].unicode() + 1;
+	}
+	else
+	{
+		batch[position] = 'A';
+		if(position > 0)
+		{
+			position--;
+			goto increment;
+		}
+		else
+		{
+			batch.append("A");
+		}
+	}
+	@<Replace batch holder in template@>@;
 }
 
 @ A script constructor is needed to allow an |AnnotationButton| to be created
