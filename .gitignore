@@ -11,3 +11,4 @@ typica.c
 *.toc
 Typica-build*
 *.o
+*.DS_Store
