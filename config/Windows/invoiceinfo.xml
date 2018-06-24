@@ -14,12 +14,27 @@
 	<program>
 		<![CDATA[
 			var window = this;
-                        var invoiceID = 0;
+            var invoiceID = 0;
 			var table = findChildObject(this, 'itemtable');
+			var timefield = findChildObject(this, 'date');
+			var vendorfield = findChildObject(this, 'vendor');
+			var invoicefield = findChildObject(this, 'invoice');
+			var w = window;
 			this.setInvoiceID = function(arg) {
-				window.invoiceID = arg;
-                                invoiceID = arg;
-				window.windowTitle = TTR("invoiceinfo", "Typica - Invoice Details ") + arg;
+				w.invoiceID = arg;
+                invoiceID = arg;
+				w.windowTitle = TTR("invoiceinfo", "Typica - Invoice Details ") + arg;
+                var query = new QSqlQuery();
+                query.exec("SELECT time, invoice, vendor FROM invoices WHERE id = " + arg);
+                query.next();
+                timefield.text = query.value(0);
+                vendorfield.text = query.value(2);
+                invoicefield.text = query.value(1);
+                table.setQuery("SELECT record_type, item_id, description, (SELECT reference FROM items WHERE id = item_id) AS reference, (SELECT cost FROM purchase WHERE item = item_id) AS unit_cost, (SELECT quantity FROM purchase WHERE item = item_id) AS quantity, ((SELECT quantity FROM purchase WHERE item = item_id)/(SELECT conversion FROM lb_bag_conversion WHERE item = item_id))::numeric(12,2) AS sacks, cost FROM invoice_items WHERE invoice_id = " + arg + " AND record_type = 'PURCHASE' UNION SELECT record_type, NULL, description, NULL, NULL, NULL, NULL, cost FROM invoice_items WHERE invoice_id = " + arg + " AND record_type = 'FEE' ORDER BY item_id");
+                query = query.invalidate();
+			};
+			this.refresh = function() {
+				w.setInvoiceID(w.invoiceID);
 			};
 			button = findChildObject(this, 'edit');
 			button.clicked.connect(function() {
@@ -34,6 +49,7 @@
 				if(table.data(arg, 0) == 'PURCHASE') {
 					var itemWindow = createWindow("invoiceitemdetail");
 					itemWindow.rowData = [];
+					itemWindow.pWindow = w;
 					for(var i = 0; i < 8; i++) {
 						itemWindow.rowData[i] = table.data(arg, i);
 					}
@@ -42,10 +58,11 @@
 				else {
 					var feeWindow = createWindow("invoicefeedetail");
 					feeWindow.rowData = [];
+					feeWindow.pWindow = w;
 					for(var i = 0; i < 8; i++) {
 						feeWindow.rowData[i] = table.data(arg, i);
 					}
-                                        feeWindow.invoiceID = invoiceID;
+                    feeWindow.invoiceID = invoiceID;
 					feeWindow.dataSet();
 				}
 			});

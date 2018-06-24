@@ -35,6 +35,7 @@
 				query.bind(":oldcost", window.rowData[7]);
 				query.exec();
 				query = query.invalidate();
+				window.pWindow.refresh();
 				window.close();
 			});
 		]]>

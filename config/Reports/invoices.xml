@@ -44,18 +44,6 @@
             view.scriptLinkClicked.connect(function(url) {
                 var info = createWindow("invoiceinfo");
                 info.setInvoiceID(url);
-                var invquery = new QSqlQuery();
-                invquery.exec("SELECT time, invoice, vendor FROM invoices WHERE id = " + url);
-                invquery.next();
-                var timefield = findChildObject(info, 'date');
-                timefield.text = invquery.value(0);
-                var vendorfield = findChildObject(info, 'vendor');
-                vendorfield.text = invquery.value(2);
-                var invoicefield = findChildObject(info, 'invoice');
-                invoicefield.text = invquery.value(1);
-                var itemtable = findChildObject(info, 'itemtable');
-                itemtable.setQuery("SELECT record_type, item_id, description, (SELECT reference FROM items WHERE id = item_id) AS reference, (SELECT cost FROM purchase WHERE item = item_id) AS unit_cost, (SELECT quantity FROM purchase WHERE item = item_id) AS quantity, ((SELECT quantity FROM purchase WHERE item = item_id)/(SELECT conversion FROM lb_bag_conversion WHERE item = item_id))::numeric(12,2) AS sacks, cost FROM invoice_items WHERE invoice_id = " + url + " AND record_type = 'PURCHASE' UNION SELECT record_type, NULL, description, NULL, NULL, NULL, NULL, cost FROM invoice_items WHERE invoice_id = " + url + " AND record_type = 'FEE' ORDER BY item_id");
-                invquery = invquery.invalidate();
             });
             function refresh() {
                 var dateRange = dateSelect.currentRange();

@@ -96,7 +96,9 @@
                     query.exec();
                 }
                 if(qbupdated) {
-                    query.exec("SELECT 1 FROM lb_bag_conversion WHERE item = :id");
+                    query.prepare("SELECT 1 FROM lb_bag_conversion WHERE item = :id");
+					query.bind(":id", Number(window.rowData[1]));
+					query.exec();
                     if(query.next()) {
                         query.prepare("UPDATE lb_bag_conversion SET conversion = :conv WHERE item = :id");
                     } else {
@@ -107,6 +109,7 @@
                     query.exec();
                 }
                 query = query.invalidate();
+				window.pWindow.refresh();
                 window.close();
             });
         ]]>
