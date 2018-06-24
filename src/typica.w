@@ -3932,6 +3932,30 @@ template<> QTime argument(int arg, QScriptContext *context)
     return qscriptvalue_cast<QTime>(context->argument(arg));
 }
 
+@* Scripting QColor.
+
+\noindent |QColor| support is limited to creating colors from strings to pass
+to objects expecting a color.
+
+@<Function prototypes for scripting@>=
+QScriptValue constructQColor(QScriptContext *context, QScriptEngine *engine);
+
+@ We must tell the script engine about the constructor. This is not done in
+quite the same way as is done for |QObject| derived types.
+
+@<Set up the scripting engine@>=
+constructor = engine->newFunction(constructQColor);
+engine->globalObject().setProperty("QColor", constructor);
+
+@ The constructor is trivial.
+
+@<Functions for scripting@>=
+QScriptValue constructQColor(QScriptContext *context, QScriptEngine *engine)
+{
+    QScriptValue object = engine->toScriptValue<QColor>(QColor(argument<QString>(0, context)));
+    return object;
+}
+
 @* Scripting Item View Classes.
 
 \noindent |QAbstractScrollArea| is a |QFrame| that serves as the base class for
@@ -6737,8 +6761,8 @@ QScriptValue SaltTable_setData(QScriptContext *context, QScriptEngine *)
     QTableView *self = getself<QTableView *>(context);
     int row = argument<int>(0, context);
     int column = argument<int>(1, context);
-    QVariant value = argument<QVariant>(2, context);
-    int role = argument<int>(3, context);
+	QVariant value = argument<QVariant>(2, context);
+	int role = argument<int>(3, context);
     SaltModel *model = qobject_cast<SaltModel *>(self->model());
     QModelIndex cell = model->index(row, column);
     model->setData(cell, value, role);
@@ -13390,7 +13414,7 @@ bool SaltModel::setData(const QModelIndex &index, const QVariant &value,
     }
     QList<QMap<int, QVariant> > row = modelData.at(index.row());
     QMap<int, QVariant> cell = row.at(index.column());
-    cell.insert(role, value);
+	cell.insert(role, value);
     if(role == Qt::EditRole)@/
     {
         cell.insert(Qt::DisplayRole, value);
