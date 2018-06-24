@@ -343,6 +343,11 @@
                                 }
                                 displayValue -= change;
                             }
+							var rowColor = QBrush("black");
+							if(displayValue < 0)
+							{
+								rowColor = QBrush("red");
+							}
                             var bagCount = (displayValue / bagConversion).toFixed(2);
                             switch(unitBox.currentIndex)
                             {
@@ -362,6 +367,9 @@
                                 table.setData(r, 2, displayValue, 0);
                                 table.setData(r, 2, displayValue, 2);
                                 table.resizeColumnToContents(2);
+								table.setData(r, 0, rowColor, 9);
+								table.setData(r, 1, rowColor, 9);
+								table.setData(r, 2, rowColor, 9);
                             }
                         }
                     }
