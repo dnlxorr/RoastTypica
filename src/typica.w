@@ -5984,6 +5984,10 @@ else if(currentElement.attribute("delegate") == "numeric")
 {
     @<Assign numeric column delegate@>@;
 }
+else if(currentElement.attribute("delegate") == "positivenumeric")
+{
+	@<Assign positive numeric column delegate@>@;
+}
 
 @ When using a |SaltModel|, there are times where the array values being
 inserted are identification numbers representing some record that already exists
@@ -6028,12 +6032,17 @@ widget->addSqlOptions(currentElement.text());
 delegate->setWidget(widget);
 view->setItemDelegateForColumn(currentColumn, delegate);
 
-@ Another common use is allowing numeric values. At present this only
-restricts input to numbers, however it may be useful to provide other options
-such as restricting the range of allowed values in the future.
+@ Another common use is allowing numeric values.
 
 @<Assign numeric column delegate@>=
 NumericDelegate *delegate = new NumericDelegate;
+view->setItemDelegateForColumn(currentColumn, delegate);
+
+@ It is also possible to restrict allowed numeric values to non-negative
+values.
+
+@<Assign positive numeric column delegate@>=
+NumericDelegate *delegate = new NumericDelegate(true);
 view->setItemDelegateForColumn(currentColumn, delegate);
 
 @ The |NumericDelegate| will only set the display value to a number, but it
@@ -6046,7 +6055,7 @@ class NumericDelegate : public QItemDelegate@/
 {
     @[Q_OBJECT@]@;
     public:@/
-        NumericDelegate(QObject *parent = NULL);
+        NumericDelegate(bool positiveOnly = false, QObject *parent = NULL);
         QWidget *createEditor(QWidget *parent,
                               const QStyleOptionViewItem &option,@|
                               const QModelIndex &index) const;
@@ -6056,13 +6065,15 @@ class NumericDelegate : public QItemDelegate@/
         void updateEditorGeometry(QWidget *editor,
                                   const QStyleOptionViewItem &option,@|
                                   const QModelIndex &index) const;
+	private:
+		bool m_positiveOnly;
 };
 
 @ There is nothing special about the constructor.
 
 @<NumericDelegate implementation@>=
-NumericDelegate::NumericDelegate(QObject *parent) :
-    QItemDelegate(parent)
+NumericDelegate::NumericDelegate(bool positiveOnly, QObject *parent) :
+    QItemDelegate(parent), m_positiveOnly(positiveOnly)
 {
     /* Nothing needs to be done here. */
 }
@@ -6099,7 +6110,21 @@ void NumericDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     QScriptValue result = engine->evaluate(line->text());
     if(result.isNumber())
     {
-        model->setData(index, result.toVariant(), Qt::DisplayRole);
+		if(m_positiveOnly)
+		{
+			if(result.toNumber() < 0)
+			{
+				model->setData(index, QVariant(), Qt::DisplayRole);
+			}
+			else
+			{
+				model->setData(index, result.toVariant(), Qt::DisplayRole);
+			}
+		}
+		else
+		{
+			model->setData(index, result.toVariant(), Qt::DisplayRole);
+		}
     }
     else
     {
