@@ -83,8 +83,6 @@ projects->setCurrentItem(item);
 setWebView(item, NULL);
 item = new QListWidgetItem("d3.js", projects);
 item->setData(Qt::UserRole, QVariant(QUrl("qrc:/resources/html/licenses/d3.html")));
-item = new QListWidgetItem("Entypo", projects);
-item->setData(Qt::UserRole, QVariant(QUrl("qrc:/resources/html/licenses/entypo.html")));
 item = new QListWidgetItem("Tango Desktop Project", projects);
 item->setData(Qt::UserRole, QVariant(QUrl("qrc:/resources/html/licenses/tango.html")));
 item = new QListWidgetItem("QextSerialPort", projects);
