@@ -3956,6 +3956,30 @@ QScriptValue constructQColor(QScriptContext *context, QScriptEngine *engine)
     return object;
 }
 
+@* Scripting QBrush.
+
+\noindent |QBrush| support is limited to creating brushes from color strings to
+pass to objects expecting a brush.
+
+@<Function prototypes for scripting@>=
+QScriptValue constructQBrush(QScriptContext *context, QScriptEngine *engine);
+
+@ The script is informed of the constructor.
+
+@<Set up the scripting engine@>=
+constructor = engine->newFunction(constructQBrush);
+engine->globalObject().setProperty("QBrush", constructor);
+
+@ The constructor is trivial.
+
+@<Functions for scripting@>=
+QScriptValue constructQBrush(QScriptContext *context, QScriptEngine *engine)
+{
+	QBrush theBrush = QBrush(QColor(argument<QString>(0, context)));
+	QScriptValue object = engine->toScriptValue(theBrush);
+	return object;
+}
+
 @* Scripting Item View Classes.
 
 \noindent |QAbstractScrollArea| is a |QFrame| that serves as the base class for
