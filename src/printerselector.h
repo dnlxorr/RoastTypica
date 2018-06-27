@@ -1,4 +1,4 @@
-/*589:*/
+/*598:*/
 #line 22 "./printerselector.w"
 
 #include <QPrinterInfo> 
@@ -16,4 +16,4 @@ PrinterSelector();
 
 #endif
 
-/*:589*/
+/*:598*/

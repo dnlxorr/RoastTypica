@@ -1,4 +1,4 @@
-/*1102:*/
+/*1111:*/
 #line 103 "./scales.w"
 
 #ifndef TypicaScaleInclude
@@ -29,4 +29,4 @@ QByteArray commandTerminator;
 
 #endif
 
-/*:1102*/
+/*:1111*/
