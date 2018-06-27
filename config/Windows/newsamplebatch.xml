@@ -201,10 +201,7 @@
                 }
             });
             var doRoast = function() {
-				var lc = 1;
 				currentBatchInfo = batch;
-                var targetseries = -1;
-                navigationwindow.loggingWindow.clearLog();
 				query = new QSqlQuery();
 				var q = "SELECT file FROM sample_roast_profiles WHERE profile_name = :name AND time = (SELECT max(time) FROM sample_roast_profiles WHERE profile_name = :again)";
 				query.prepare(q);
@@ -220,47 +217,17 @@
 					if(query.next())
 					{
 						var buffer = new QBuffer(query.value(0));
-						var input = new XMLInput(buffer, 1);
-						var graph = findChildObject(navigationwindow.loggingWindow, 'graph');
-						var log = findChildObject(navigationwindow.loggingWindow, 'log');
-						input.newTemperatureColumn.connect(function(col, text) {
-							log.setHeaderData(col, text);
-							if(text == navigationwindow.loggingWindow.targetcolumnname)
-							{
-								targetseries = col;
-							}
-						});
-						input.newAnnotationColumn.connect(log.setHeaderData);
-						input.measure.connect(graph.newMeasurement);
-						input.measure.connect(log.newMeasurement);
-						input.measure.connect(function(data, series) {
-							if(series == targetseries) {
-								targetDetector.newMeasurement(data);
-							}
-						});
-						input.annotation.connect(log.newAnnotation);
-						input.lastColumn.connect(function(c) {
-							lc = c;
-							QSettings.setValue("liveColumn", c+1);
-							navigationwindow.loggingWindow.postLoadColumnSetup(c);
-						});
-						log.updatesEnabled = false;
-						graph.updatesEnabled = false;
-						input.input();
-						graph.updatesEnabled = true;
-						log.updatesEnabled = true;
-						log.newAnnotation(TTR("sampleRoastingBatch", "End"), 1, lc);
+						Windows.loggingWindow.loadPlan(buffer, name.text);
 					}
 				}
-                navigationwindow.loggingWindow.raise();
-                navigationwindow.loggingWindow.activateWindow();
-				query = query.invalidate();
-				var t = TTR("sampleRoastingBatch", "Typica - Sample Roasting: [*]") + name.text;
-				if(profileName.currentText != '')
+				else
 				{
-					t = t + ", " + profileName.currentText;
+					Windows.loggingWindow.clearLog();
+					Windows.loggingWindow.windowTitle = 'Typica - [*]' + name.text;
+					Windows.loggingWindow.raise();
+					Windows.loggingWindow.activateWindow();
 				}
-				navigationwindow.loggingWindow.windowTitle = t;
+				query = query.invalidate();
 			};
 			var notes = findChildObject(this, 'annotation');
 			var machine = findChildObject(this, 'machine');

@@ -220,9 +220,9 @@
             var scalesLayout = findChildObject(this, 'scales');
             scalesLayout.spacing = 10;
             var batchTag = findChildObject(this, 'batchTag');
-            if(navigationwindow.loggingWindow.scales.length > 0) {
-                for(var i = 0; i < navigationwindow.loggingWindow.scales.length; i++) {
-                    var scale = navigationwindow.loggingWindow.scales[i];
+            if(Windows.loggingWindow.scales.length > 0) {
+                for(var i = 0; i < Windows.loggingWindow.scales.length; i++) {
+                    var scale = Windows.loggingWindow.scales[i];
                     var label = new DragLabel();
                     var weighButton = new QPushButton();
                     weighButton.text = "Weigh";
@@ -616,9 +616,9 @@
             var doNoProfile = function() {
                 batch.windowModified = true;
                 currentBatchInfo = batch;
-				navigationwindow.loggingWindow.clearLog();
-                navigationwindow.loggingWindow.raise();
-                navigationwindow.loggingWindow.activateWindow();
+				Windows.loggingWindow.clearLog();
+                Windows.loggingWindow.raise();
+                Windows.loggingWindow.activateWindow();
                 if(scheduledID > 0) {
                     markTaken();
                 }
