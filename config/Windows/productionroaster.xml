@@ -1080,6 +1080,7 @@
             for(var i = 0; i < rateadapters.length; i++) {
                 rateadapters[i].measurement.disconnect(graph.newMeasurement);
             }
+			targetOffset = 0;
             if(typeof(currentBatchInfo) == 'undefined') { } else {
                 lc = Number(QSettings.value("liveColumn"));
                 var duration = log.lastTime(lc);
@@ -1199,6 +1200,7 @@
 			}
 			resetTranslation.enabled = false;
 			setTranslation.enabled = false;
+			targetOffset = 0;
         };
         clear.triggered.connect(window.clearLog);
 		var openMenu = findChildObject(this, 'open');
