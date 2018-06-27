@@ -177,6 +177,7 @@
                 input.newAnnotationColumn.connect(log.setHeaderData);
                 input.measure.connect(graph.newMeasurement);
                 input.measure.connect(log.newMeasurement);
+				var targetDetector = Windows.loggingWindow.targetDetector;
                 input.measure.connect(function(data, series) {
                     if(series == targetseries) {
                         targetDetector.newMeasurement(data);
