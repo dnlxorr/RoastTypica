@@ -1222,48 +1222,54 @@
             exportWindow.windowTitle = TTR("basicWindow", "Typica - Export XHTML+SVG");
             exportWindow.log = log;
         });
+		window.loadPlan = function(device, name) {
+			window.clearLog();
+			var input = new XMLInput(device, 1);
+			targetseries = -1;
+            input.newTemperatureColumn.connect(log.setHeaderData);
+			input.newTemperatureColumn.connect(function(col, text) {
+				if(text == window.targetcolumnname) {
+					targetseries = col;
+				}
+			});
+            input.newAnnotationColumn.connect(log.setHeaderData);
+            input.measure.connect(graph.newMeasurement);
+            input.measure.connect(log.newMeasurement);
+			input.measure.connect(function(data, series) {
+				if(series == targetseries) {
+					targetDetector.newMeasurement(data);
+				}
+			});
+			resetTranslation.enabled = false;
+			setTranslation.enabled = false;
+            input.annotation.connect(log.newAnnotation);
+			input.annotation.connect(function(note, tcol, ncol) {
+				for(var i = tcol; i < ncol; i++) {
+					log.newAnnotation(note, i, ncol);
+				}
+			});
+			var lc;
+            input.lastColumn.connect(function(c) {
+				lc = c;
+                QSettings.setValue("liveColumn", c + 1);
+				window.postLoadColumnSetup(c);
+			});
+			graph.updatesEnabled = false;
+			log.updatesEnabled = false;
+            input.input();
+			log.updatesEnabled = true;
+			graph.updatesEnabled = true;
+			window.windowTitle = 'Typica - [*]' + name;
+			log.newAnnotation(TTR("basicWindow", "End"), 1, lc);
+			window.raise();
+			window.activateWindow();
+		}
         openMenu.triggered.connect(function() {
             var filename = QFileDialog.getOpenFileName(window, TTR("basicWindow", "Open Log..."), QSettings.value('script/lastDir', '') + '/');
             if(filename != '') {
                 var file = new QFile(filename);
-                var input = new XMLInput(file, 1);
-				targetseries = -1;
-                input.newTemperatureColumn.connect(log.setHeaderData);
-				input.newTemperatureColumn.connect(function(col, text) {
-					if(text == window.targetcolumnname) {
-						targetseries = col;
-					}
-				});
-                input.newAnnotationColumn.connect(log.setHeaderData);
-                input.measure.connect(graph.newMeasurement);
-                input.measure.connect(log.newMeasurement);
-				input.measure.connect(function(data, series) {
-					if(series == targetseries) {
-						targetDetector.newMeasurement(data);
-					}
-				});
-				resetTranslation.enabled = false;
-				setTranslation.enabled = false;
-                input.annotation.connect(log.newAnnotation);
-				input.annotation.connect(function(note, tcol, ncol) {
-					for(var i = tcol; i < ncol; i++) {
-						log.newAnnotation(note, i, ncol);
-					}
-				});
-				var lc;
-                input.lastColumn.connect(function(c) {
-					lc = c;
-                    QSettings.setValue("liveColumn", c + 1);
-					window.postLoadColumnSetup(c);
-				});
-				graph.updatesEnabled = false;
-				log.updatesEnabled = false;
-                input.input();
-				log.updatesEnabled = true;
-				graph.updatesEnabled = true;
-                window.windowTitle = 'Typica - [*]' + baseName(filename);
+				window.loadPlan(file, baseName(filename));
                 QSettings.setValue("script/lastDir", dir(filename));
-				log.newAnnotation(TTR("basicWindow", "End"), 1, lc);
             }
         });
 		var columnName = function(c) {

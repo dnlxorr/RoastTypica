@@ -578,8 +578,6 @@
                 query.bind(":item", Number(roasted.currentData()));
                 query.bind(":again", Number(roasted.currentData()));
                 query.exec();
-                var graph;
-                var log;
                 if(query.next())
                 {
                     var files = query.value(0);
@@ -591,53 +589,12 @@
                     query.exec(q);
                     if(query.next())
                     {
-                        var targetseries = -1;
                         var buffer = new QBuffer(query.value(0));
                         var pname = query.value(1);
-                        var input = new XMLInput(buffer, 1);
-                        graph = findChildObject(navigationwindow.loggingWindow, 'graph');
-                        log = findChildObject(navigationwindow.loggingWindow, 'log');
-                        log.clear();
-                        graph.clear();
-                        input.newTemperatureColumn.connect(log.setHeaderData);
-                        input.newTemperatureColumn.connect(function(col, text) {
-                            if(text == navigationwindow.loggingWindow.targetcolumnname)
-                            {
-                                targetseries = col;
-                            }
-                        });
-                        input.newAnnotationColumn.connect(log.setHeaderData);
-                        input.measure.connect(graph.newMeasurement);
-                        input.measure.connect(log.newMeasurement);
-                        input.measure.connect(function(data, series) {
-                            if(series == targetseries)
-                            {
-                                targetDetector.newMeasurement(data);
-                            }
-                        });
-                        var lc;
-                        input.lastColumn.connect(function(c) {
-                            lc = c;
-                            QSettings.setValue("liveColumn", c + 1);
-                            navigationwindow.loggingWindow.postLoadColumnSetup(c)
-                        });
-                        input.annotation.connect(function(note, tcol, ncol) {
-                            for(var i = tcol; i < ncol; i++) {
-                                log.newAnnotation(note, i, ncol);
-                            }
-                        });
+						Windows.loggingWindow.loadPlan(buffer, pname);
                     }
                 }
                 query = query.invalidate();
-                navigationwindow.loggingWindow.windowTitle = "Typica - [*]" + pname;
-                navigationwindow.loggingWindow.raise();
-                navigationwindow.loggingWindow.activateWindow();
-                graph.updatesEnabled = false;
-                log.updatesEnabled = false;
-                input.input();
-                log.updatesEnabled = true;
-                graph.updatesEnabled = true;
-                log.newAnnotation(TTR("batchWindow", "End"), 1, lc);
             }
             var noprofilebutton = findChildObject(this, 'noprofile');
             noprofilebutton.clicked.connect(function() {
@@ -659,6 +616,7 @@
             var doNoProfile = function() {
                 batch.windowModified = true;
                 currentBatchInfo = batch;
+				navigationwindow.loggingWindow.clearLog();
                 navigationwindow.loggingWindow.raise();
                 navigationwindow.loggingWindow.activateWindow();
                 if(scheduledID > 0) {

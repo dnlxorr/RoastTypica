@@ -163,48 +163,7 @@
                 var buffer = new QBuffer(query.value(0));
                 var pname = query.value(1);
                 query = query.invalidate();
-                var input = new XMLInput(buffer, 1);
-                var graph = findChildObject(Windows.loggingWindow, 'graph');
-                var log = findChildObject(Windows.loggingWindow, 'log');
-                log.clear();
-                graph.clear();
-                input.newTemperatureColumn.connect(log.setHeaderData);
-                input.newTemperatureColumn.connect(function(col, text) {
-                    if(text == Windows.loggingWindow.targetcolumnname) {
-                        targetseries = col;
-                    }
-                });
-                input.newAnnotationColumn.connect(log.setHeaderData);
-                input.measure.connect(graph.newMeasurement);
-                input.measure.connect(log.newMeasurement);
-				var targetDetector = Windows.loggingWindow.targetDetector;
-                input.measure.connect(function(data, series) {
-                    if(series == targetseries) {
-                        targetDetector.newMeasurement(data);
-                    }
-                });
-                var lc;
-                input.lastColumn.connect(function(c) {
-                    lc = c;
-                    QSettings.setValue("liveColumn", c + 1);
-                    Windows.loggingWindow.postLoadColumnSetup(c);
-                });
-                input.annotation.connect(log.newAnnotation);
-                input.annotation.connect(function(note, tcol, ncol) {
-                    for(var i = tcol; i < ncol; i++) {
-                        log.newAnnotation(note, i, ncol);
-                    }
-                });
-                Windows.loggingWindow.windowTitle = "Typica - " + pname;
-                Windows.loggingWindow.raise();
-                Windows.loggingWindow.activateWindow();
-                graph.updatesEnabled = false;
-                log.updatesEnabled = false;
-                input.input();
-                log.updatesEnabled = true;
-                graph.updatesEnabled = true;
-                log.newAnnotation(TTR("batchDetails", "End"), 1, lc);
-                query = query.invalidate();
+				Windows.loggingWindow.loadPlan(buffer, pname);
             });
             var approvalButton = findChildObject(this, 'approval');
             var annotationField = findChildObject(this, 'annotation');
