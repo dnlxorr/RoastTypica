@@ -118,7 +118,9 @@
                         <button type="push" name="Add Certification" id="addcert" />
                     </column>
                     <column colspan="2">
-                        <line id="certification" />
+						<sqldrop data="0" display="0" showdata="false" editable="true" id="certification">
+							<query>SELECT DISTINCT certification FROM certifications ORDER BY certification ASC</query>
+						</sqldrop>
                     </column>
                 </row>
             </layout>
@@ -186,9 +188,9 @@
                     {
                         thisCoffee.certificationArray = new Array();
                     }
-                    thisCoffee.certificationArray.push(certSource.text);
+                    thisCoffee.certificationArray.push(certSource.currentText);
                     certTarget.text = thisCoffee.certificationArray.toString();
-                    certSource.text = '';
+                    certSource.currentIndex = -1;
                 });
             };
             appendForm();
