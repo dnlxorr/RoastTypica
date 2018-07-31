@@ -1,0 +1,71 @@
+<window id="editinventorytransaction">
+	<layout type="vertical">
+		<layout type="horizontal">
+			<label>Time:</label>
+			<line id="time" writable="false" />
+			<label>Item:</label>
+			<line id="item" writable="false" />
+			<label>Quantity:</label>
+			<line id="quantity" />
+		</layout>
+		<layout type="horizontal">
+			<button id="delete" name="Delete Transaction" type="push" />
+			<stretch />
+			<button id="save" name="Save Changes" type="push" />
+		</layout>
+	</layout>
+	<program>
+		<![CDATA[
+			var window = this;
+			var w = window;
+			this.windowTitle = TTR("editinventorytransaction", "Typica - Edit Inventory Transaction");
+			timeField = findChildObject(this, 'time');
+			itemField = findChildObject(this, 'item');
+			quantityField = findChildObject(this, 'quantity');
+			deleteButton = findChildObject(this, 'delete');
+			saveButton = findChildObject(this, 'save');
+			this.loadTransaction = function(item, timestamp) {
+				w.itemID = item;
+				w.timestamp = timestamp;
+				timeField.text = timestamp;
+				itemField.text = item;
+				var query = new QSqlQuery();
+				query.prepare("SELECT quantity FROM inventory WHERE time = :timestamp AND item = :item");
+				query.bind(":timestamp", timestamp);
+				query.bind(":item", item);
+				query.exec();
+				if(query.next()) {
+					quantityField.text = query.value(0);
+				}
+                query = query.invalidate();
+			};
+			saveButton.clicked.connect(function() {
+				var query = new QSqlQuery();
+				query.prepare("UPDATE inventory SET quantity = :quantity WHERE item = :item AND time = :timestamp");
+				query.bind(":quantity", Number(quantityField.text));
+				query.bind(":item", Number(itemField.text));
+				query.bind(":timestamp", timeField.text);
+				query.exec();
+				query.prepare("UPDATE items SET quantity = (SELECT balance FROM item_history(:item) ORDER BY time DESC LIMIT 1) WHERE id = :item2");
+				query.bind(":item", Number(itemField.text));
+				query.bind(":item2", Number(itemField.text));
+				query.exec();
+				query = query.invalidate();
+				window.close();
+			});
+			deleteButton.clicked.connect(function() {
+				var query = new QSqlQuery();
+				query.prepare("DELETE FROM inventory WHERE item = :item AND time = :timestamp");
+				query.bind(":item", Number(itemField.text));
+				query.bind(":timestamp", timeField.text);
+				query.exec();
+				query.prepare("UPDATE items SET quantity = (SELECT balance FROM item_history(:item) ORDER BY time DESC LIMIT 1) WHERE id = :item2");
+				query.bind(":item", Number(itemField.text));
+				query.bind(":item2", Number(itemField.text));
+				query.exec();
+				query = query.invalidate();
+				window.close();
+			});
+		]]>
+	</program>
+</window>

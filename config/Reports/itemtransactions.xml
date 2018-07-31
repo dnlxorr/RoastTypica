@@ -225,7 +225,7 @@
                     }, 0));
                     output.writeEndElement();
                     output.writeEndElement();
-                    query.prepare("SELECT time::date, type, quantity / :c1, balance / :c2, (SELECT files FROM roasting_log WHERE roasting_log.time = item_history.time AND item = ANY(unroasted_id)), (SELECT invoice_id FROM invoice_items WHERE item = item_id AND item_history.type = 'PURCHASE'), (SELECT vendor || ' ' || invoice FROM invoices WHERE id = (SELECT invoice_id FROM invoice_items WHERE item = item_id AND item_history.type = 'PURCHASE')), (SELECT name FROM items WHERE id = (SELECT roasted_id FROM roasting_log WHERE roasting_log.time = item_history.time AND item = ANY(unroasted_id))), customer, reason, (SELECT person FROM transactions WHERE time = item_history.time AND item = item_history.item), (SELECT machine || '@' || time FROM roasting_log WHERE roasting_log.time = item_history.time AND item = ANY(unroasted_id)) AS link FROM item_history(:item) WHERE time >= :sd AND time < :ed ::date + interval '1 day'");
+                    query.prepare("SELECT time::date, type, quantity / :c1, balance / :c2, (SELECT files FROM roasting_log WHERE roasting_log.time = item_history.time AND item = ANY(unroasted_id)), (SELECT invoice_id FROM invoice_items WHERE item = item_id AND item_history.type = 'PURCHASE'), (SELECT vendor || ' ' || invoice FROM invoices WHERE id = (SELECT invoice_id FROM invoice_items WHERE item = item_id AND item_history.type = 'PURCHASE')), (SELECT name FROM items WHERE id = (SELECT roasted_id FROM roasting_log WHERE roasting_log.time = item_history.time AND item = ANY(unroasted_id))), customer, reason, (SELECT person FROM transactions WHERE time = item_history.time AND item = item_history.item), (SELECT machine || '@' || time FROM roasting_log WHERE roasting_log.time = item_history.time AND item = ANY(unroasted_id)) AS link, time::text FROM item_history(:item) WHERE time >= :sd AND time < :ed ::date + interval '1 day'");
                     query.bind(":sd", startDate);
                     query.bind(":ed", endDate);
                     switch(unitBox.currentIndex)
@@ -279,7 +279,7 @@
                             output.writeTextElement("td", (Number(query.value(2)).toFixed(prec)));
                         }
                         output.writeTextElement("td", (Number(query.value(3)).toFixed(prec)));
-                                prev_balance = query.value(3);
+                        prev_balance = query.value(3);
                         if(query.value(1) == "PURCHASE") {
                             output.writeStartElement("td");
                             output.writeStartElement("a");
@@ -298,7 +298,14 @@
                             output.writeTextElement("td", query.value(9));
                         } else if(query.value(1) == "SALE") {
                             output.writeTextElement("td", query.value(8));
-                        } else {
+                        } else if(query.value(1) == "INVENTORY") {
+							output.writeStartElement("td");
+							output.writeStartElement("a");
+							output.writeAttribute("href", "typica://script/n/" + itemBox.currentData() + "@" + query.value(12));
+							output.writeCDATA("Edit");
+							output.writeEndElement();
+							output.writeEndElement();
+						} else {
                             output.writeTextElement("td", "");
                         }
 						output.writeTextElement("td", query.value(10));
@@ -351,6 +358,13 @@
                 var details = createWindow("batchDetails");
                 details.loadBatch(key[0], key[1]);
             };
+			/* Open inventory transaction editor */
+			var openInventory = function(url) {
+				var arg = decodeURI(url.slice(2, url.length));
+				var key = arg.split("@");
+				var editor = createWindow("editinventorytransaction");
+				editor.loadTransaction(key[0], key[1]);
+			};
             view.scriptLinkClicked.connect(function(url) {
                 var linkType = url[0];
                 switch(linkType) {
@@ -360,6 +374,9 @@
                     case 'b':
                         openProfile(url);
                         break;
+					case 'n':
+						openInventory(url);
+						break;
                 }
             });
         ]]>
