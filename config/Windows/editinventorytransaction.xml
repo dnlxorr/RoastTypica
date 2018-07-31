@@ -54,17 +54,20 @@
 				window.close();
 			});
 			deleteButton.clicked.connect(function() {
-				var query = new QSqlQuery();
-				query.prepare("DELETE FROM inventory WHERE item = :item AND time = :timestamp");
-				query.bind(":item", Number(itemField.text));
-				query.bind(":timestamp", timeField.text);
-				query.exec();
-				query.prepare("UPDATE items SET quantity = (SELECT balance FROM item_history(:item) ORDER BY time DESC LIMIT 1) WHERE id = :item2");
-				query.bind(":item", Number(itemField.text));
-				query.bind(":item2", Number(itemField.text));
-				query.exec();
-				query = query.invalidate();
-				window.close();
+				var proceed = displayWarning(TTR("editinventorytransaction", "Are you sure?"), TTR("editinventorytransaction", "Deleting this transaction can not be undone. Continue?"));
+				if(proceed) {
+					var query = new QSqlQuery();
+					query.prepare("DELETE FROM inventory WHERE item = :item AND time = :timestamp");
+					query.bind(":item", Number(itemField.text));
+					query.bind(":timestamp", timeField.text);
+					query.exec();
+					query.prepare("UPDATE items SET quantity = (SELECT balance FROM item_history(:item) ORDER BY time DESC LIMIT 1) WHERE id = :item2");
+					query.bind(":item", Number(itemField.text));
+					query.bind(":item2", Number(itemField.text));
+					query.exec();
+					query = query.invalidate();
+					window.close();
+				}
 			});
 		]]>
 	</program>
