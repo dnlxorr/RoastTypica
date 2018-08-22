@@ -40546,21 +40546,21 @@ extern Q_CORE_EXPORT bool qUnregisterResourceData
 QT_END_NAMESPACE
 
 
-int QT_MANGLE_NAMESPACE(qInitResources)()
+int QT_MANGLE_NAMESPACE(qInitResources_resources)()
 {
     QT_PREPEND_NAMESPACE(qRegisterResourceData)
         (0x01, qt_resource_struct, qt_resource_name, qt_resource_data);
     return 1;
 }
 
-Q_CONSTRUCTOR_FUNCTION(QT_MANGLE_NAMESPACE(qInitResources))
+Q_CONSTRUCTOR_FUNCTION(QT_MANGLE_NAMESPACE(qInitResources_resources))
 
-int QT_MANGLE_NAMESPACE(qCleanupResources)()
+int QT_MANGLE_NAMESPACE(qCleanupResources_resources)()
 {
     QT_PREPEND_NAMESPACE(qUnregisterResourceData)
        (0x01, qt_resource_struct, qt_resource_name, qt_resource_data);
     return 1;
 }
 
-Q_DESTRUCTOR_FUNCTION(QT_MANGLE_NAMESPACE(qCleanupResources))
+Q_DESTRUCTOR_FUNCTION(QT_MANGLE_NAMESPACE(qCleanupResources_resources))
 
