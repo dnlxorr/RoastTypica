@@ -21,6 +21,8 @@ In order to simplify the implementation of certain features, we subclass
 #include <QWebFrame>
 #include <QWebElement>
 #include <QSettings>
+#include <QDesktopWidget>
+#include <QApplication>
 
 #ifndef TypicaWebViewHeader
 #define TypicaWebViewHeader
@@ -59,6 +61,10 @@ TypicaWebView::TypicaWebView() : QWebView()
 {
 	page()->setLinkDelegationPolicy(QWebPage::DelegateExternalLinks);
 	connect(page(), SIGNAL(linkClicked(QUrl)), this, SLOT(linkDelegate(QUrl)));
+	
+    QDesktopWidget *desktop = QApplication::desktop();
+    const int dpi = desktop->logicalDpiX();
+    setZoomFactor(dpi/96);
 }
 
 @ When a link is clicked, one of three things may happen. Certain reserved URLs
