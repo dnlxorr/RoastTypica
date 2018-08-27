@@ -34,5 +34,6 @@
         <file>resources/html/licenses/d3.html</file>
         <file>resources/html/licenses/qextserialport.html</file>
         <file>resources/html/licenses/qrcode-svg.html</file>
+        <file>resources/css/default.css</file>
     </qresource>
 </RCC>

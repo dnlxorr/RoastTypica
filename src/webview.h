@@ -10,6 +10,8 @@
 #include <QWebFrame> 
 #include <QWebElement> 
 #include <QSettings> 
+#include <QDesktopWidget> 
+#include <QApplication> 
 
 #ifndef TypicaWebViewHeader
 #define TypicaWebViewHeader

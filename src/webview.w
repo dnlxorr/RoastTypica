@@ -56,6 +56,13 @@ class TypicaWebView : public QWebView@/
 
 @ In the constructor we set up our link delegation policy.
 
+The call to |setZoomFactor()| is used because WebKit assumes that the displays
+are all 96dpi. Without this, reports appear too small on HiDPI displays.
+
+Another new feature for \pn{} 1.9.2 is setting a default stylesheet. This can
+be used to prevent reports from being unreadable when using a dark theme, for
+example.
+
 @<TypicaWebView implementation@>=
 TypicaWebView::TypicaWebView() : QWebView()
 {
@@ -64,7 +71,9 @@ TypicaWebView::TypicaWebView() : QWebView()
 	
     QDesktopWidget *desktop = QApplication::desktop();
     const int dpi = desktop->logicalDpiX();
-    setZoomFactor(dpi/96);
+    setZoomFactor((qreal)(dpi)/96.0);
+    
+    settings()->setUserStyleSheetUrl(QUrl("qrc:/resources/css/default.css"));
 }
 
 @ When a link is clicked, one of three things may happen. Certain reserved URLs
