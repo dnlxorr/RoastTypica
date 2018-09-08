@@ -151,17 +151,12 @@
                     output.writeAttribute("href", "typica://script/r" + rowIndex);
                     rowIndex++;
                     rowData.push(query.value(0));
-                    output.writeCharacters(query.value(0));
+                    output.writeCharacters(sanitize(query.value(0)));
                     output.writeEndElement();
                     output.writeEndElement();
-                    output.writeTextElement("td", query.value(1));
-                    output.writeTextElement("td", query.value(2));
-                    output.writeTextElement("td", query.value(3));
-                    output.writeTextElement("td", query.value(4));
-                    output.writeTextElement("td", query.value(5));
-                    output.writeTextElement("td", query.value(6));
-                    output.writeTextElement("td", query.value(7));
-                    output.writeTextElement("td", query.value(8));
+                    for(var i = 1; i < 9; i++) {
+                        output.writeTextElement("td", query.value(i));
+                    }
                     output.writeEndElement();
                 }
                 output.writeStartElement("tr");
@@ -187,17 +182,12 @@
                     output.writeAttribute("href", "typica://script/d" + rowIndex);
                     rowIndex++;
                     rowData.push(query.value(0));
-                    output.writeCharacters(query.value(0));
+                    output.writeCharacters(sanitize(query.value(0)));
                     output.writeEndElement();
                     output.writeEndElement();
-                    output.writeTextElement("td", query.value(1));
-                    output.writeTextElement("td", query.value(2));
-                    output.writeTextElement("td", query.value(3));
-                    output.writeTextElement("td", query.value(4));
-                    output.writeTextElement("td", query.value(5));
-                    output.writeTextElement("td", query.value(6));
-                    output.writeTextElement("td", query.value(7));
-                    output.writeTextElement("td", query.value(8));
+                    for(var i = 1; i < 9; i++) {
+                        output.writeTextElement("td", query.value(i));
+                    }
                     output.writeEndElement();
                 }
                 query = query.invalidate();
@@ -264,7 +254,7 @@
                     details += "<tr>";
                     details += '<td><a href="typica://script/i' + query.value(0) + '">' + query.value(0) + "</a></td>";
                     for(var i = 1; i < 7; i++) {
-                        details += "<td>" + query.value(i) + "</td>";
+                        details += "<td>" + sanitize(query.value(i)) + "</td>";
                     }
                     details += "</tr>";
                 }
@@ -272,6 +262,16 @@
                 details += "</table></td></tr>";
                 element.appendOutside(details);
             });
+            function sanitize(value) {
+                var replacement_chars = {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    "\"": "&quot;",
+                    "'": "&#39;"
+                };
+                return value.replace(/[&<>"']/g, function(m) { return replacement_chars[m]; });
+            }
         ]]>
     </program>
 </window>
