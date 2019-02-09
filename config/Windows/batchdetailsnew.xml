@@ -163,7 +163,7 @@
                 var buffer = new QBuffer(query.value(0));
                 var pname = query.value(1);
                 query = query.invalidate();
-				Windows.loggingWindow.loadPlan(buffer, pname);
+                Windows.loggingWindow.loadPlan(buffer, pname);
             });
             var approvalButton = findChildObject(this, 'approval');
             var annotationField = findChildObject(this, 'annotation');
@@ -182,236 +182,325 @@
                 query.bind(":c1", conversion);
                 query.bind(":c2", conversion);
                 query.exec();
-                query.next();
-                var buffer = new QBuffer;
-                buffer.open(3);
-                var output = new XmlWriter(buffer);
-                output.writeStartDocument("1.0");
-                output.writeDTD('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg.dtd">');
-                output.writeStartElement("html");
-                output.writeAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-                output.writeStartElement("head");
-                output.writeTextElement("title", "Batch Details");
-                output.writeEndElement();
-                output.writeStartElement("body");
-                output.writeStartElement("div");
-                output.writeAttribute("style", "float: left; padding-right: 10px");
-                output.writeStartElement("p");
-                output.writeTextElement("strong", TTR("batchDetails", "Roasted Coffee: "));
-                output.writeTextElement("span", query.value(0));
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeStartElement("div");
-                output.writeAttribute("style", "float: left");
-                output.writeStartElement("p");
-                output.writeTextElement("strong", TTR("batchDetails", "Roasted At: "));
-                output.writeTextElement("span", batchTime);
-                output.writeEndElement();
-                output.writeStartElement("p");
-                output.writeTextElement("strong", TTR("batchDetails", "Batch Duration: "));
-                output.writeTextElement("span", query.value(1));
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeStartElement("div");
-                output.writeAttribute("style", "clear: both");
-                output.writeEndElement();
-                output.writeStartElement("table");
-                output.writeStartElement("thead");
-                output.writeStartElement("tr");
-                output.writeTextElement("th", TTR("batchDetails", "Green Coffee"));
-                output.writeTextElement("th", TTR("batchDetails", "Weight") + "(" + unitText + ")");
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeStartElement("tbody");
-                var items = sqlToArray(query.value(2));
-                var quantities = sqlToArray(query.value(3));
-                for(var i = 0; i < items.length; i++) {
+                if(query.next()) {
+                    var buffer = new QBuffer;
+                    buffer.open(3);
+                    var output = new XmlWriter(buffer);
+                    output.writeStartDocument("1.0");
+                    output.writeDTD('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg.dtd">');
+                    output.writeStartElement("html");
+                    output.writeAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+                    output.writeStartElement("head");
+                    output.writeTextElement("title", "Batch Details");
+                    output.writeEndElement();
+                    output.writeStartElement("body");
+                    output.writeStartElement("div");
+                    output.writeAttribute("style", "float: left; padding-right: 10px");
+                    output.writeStartElement("p");
+                    output.writeTextElement("strong", TTR("batchDetails", "Roasted Coffee: "));
+                    output.writeTextElement("span", query.value(0));
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    output.writeStartElement("div");
+                    output.writeAttribute("style", "float: left");
+                    output.writeStartElement("p");
+                    output.writeTextElement("strong", TTR("batchDetails", "Roasted At: "));
+                    output.writeTextElement("span", batchTime);
+                    output.writeEndElement();
+                    output.writeStartElement("p");
+                    output.writeTextElement("strong", TTR("batchDetails", "Batch Duration: "));
+                    output.writeTextElement("span", query.value(1));
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    output.writeStartElement("div");
+                    output.writeAttribute("style", "clear: both");
+                    output.writeEndElement();
+                    output.writeStartElement("table");
+                    output.writeStartElement("thead");
                     output.writeStartElement("tr");
-                    output.writeTextElement("td", items[i]);
+                    output.writeTextElement("th", TTR("batchDetails", "Green Coffee"));
+                    output.writeTextElement("th", TTR("batchDetails", "Weight") + "(" + unitText + ")");
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    output.writeStartElement("tbody");
+                    var items = sqlToArray(query.value(2));
+                    var quantities = sqlToArray(query.value(3));
+                    for(var i = 0; i < items.length; i++) {
+                        output.writeStartElement("tr");
+                        output.writeTextElement("td", items[i]);
+                        output.writeStartElement("td");
+                        output.writeAttribute("align", "center");
+                        output.writeCharacters(Number(quantities[i]/conversion).toFixed(3));
+                        output.writeEndElement();
+                        output.writeEndElement();
+                    }
+                    output.writeEndElement();
+                    output.writeStartElement("tfoot");
+                    output.writeStartElement("tr");
+                    output.writeStartElement("td");
+                    output.writeAttribute("align", "right");
+                    output.writeTextElement("strong", TTR("batchDetails", "Green Total:"));
+                    output.writeEndElement();
                     output.writeStartElement("td");
                     output.writeAttribute("align", "center");
-                    output.writeCharacters(Number(quantities[i]/conversion).toFixed(3));
+                    output.writeCharacters(query.value(4));
                     output.writeEndElement();
                     output.writeEndElement();
-                }
-                output.writeEndElement();
-                output.writeStartElement("tfoot");
-                output.writeStartElement("tr");
-                output.writeStartElement("td");
-                output.writeAttribute("align", "right");
-                output.writeTextElement("strong", TTR("batchDetails", "Green Total:"));
-                output.writeEndElement();
-                output.writeStartElement("td");
-                output.writeAttribute("align", "center");
-                output.writeCharacters(query.value(4));
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeStartElement("tr");
-                output.writeStartElement("td");
-                output.writeAttribute("align", "right");
-                output.writeTextElement("strong", TTR("batchDetails", "Roasted Weight:"));
-                output.writeEndElement();
-                output.writeStartElement("td");
-                output.writeAttribute("align", "center");
-                output.writeCharacters(query.value(5));
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeStartElement("tr");
-                output.writeStartElement("td");
-                output.writeAttribute("align", "right");
-                output.writeTextElement("strong", TTR("batchDetails", "Weight Loss:"));
-                output.writeEndElement();
-                output.writeStartElement("td");
-                output.writeAttribute("align", "center");
-                if(Number(query.value(4)) > 0) {
-                    output.writeCharacters(Number(((Number(query.value(4)) - Number(query.value(5)))/Number(query.value(4))) * 100).toFixed(2));
-                    output.writeCharacters("%");
-                } else {
-                    output.writeCharacters("unknown");
-                }
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeEndElement();
-                if(query.value(10).length > 0) {
-                    var extradata = JSON.parse(query.value(10));
-                    if(extradata.color) {
-                        output.writeStartElement("p");
-                        output.writeTextElement("strong", TTR("batchDetails", "Degree of Roast"));
-                        output.writeEndElement();
-                        if(extradata.color.whole) {
-                            wholecolor.value = extradata.color.whole;
+                    output.writeStartElement("tr");
+                    output.writeStartElement("td");
+                    output.writeAttribute("align", "right");
+                    output.writeTextElement("strong", TTR("batchDetails", "Roasted Weight:"));
+                    output.writeEndElement();
+                    output.writeStartElement("td");
+                    output.writeAttribute("align", "center");
+                    output.writeCharacters(query.value(5));
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    output.writeStartElement("tr");
+                    output.writeStartElement("td");
+                    output.writeAttribute("align", "right");
+                    output.writeTextElement("strong", TTR("batchDetails", "Weight Loss:"));
+                    output.writeEndElement();
+                    output.writeStartElement("td");
+                    output.writeAttribute("align", "center");
+                    if(Number(query.value(4)) > 0) {
+                        output.writeCharacters(Number(((Number(query.value(4)) - Number(query.value(5)))/Number(query.value(4))) * 100).toFixed(2));
+                        output.writeCharacters("%");
+                    } else {
+                        output.writeCharacters("unknown");
+                    }
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    if(query.value(10).length > 0) {
+                        var extradata = JSON.parse(query.value(10));
+                        if(extradata.color) {
                             output.writeStartElement("p");
-                            output.writeTextElement("strong", TTR("batchDetails", "Whole Bean: "));
-                            output.writeTextElement("span", extradata.color.whole);
+                            output.writeTextElement("strong", TTR("batchDetails", "Degree of Roast"));
                             output.writeEndElement();
+                            if(extradata.color.whole) {
+                                wholecolor.value = extradata.color.whole;
+                                output.writeStartElement("p");
+                                output.writeTextElement("strong", TTR("batchDetails", "Whole Bean: "));
+                                output.writeTextElement("span", extradata.color.whole);
+                                output.writeEndElement();
+                            } else {
+                                wholecolor.value = "";
+                            }
+                            if(extradata.color.ground) {
+                                groundcolor.value = extradata.color.ground;
+                                output.writeStartElement("p");
+                                output.writeTextElement("strong", TTR("batchDetails", "Ground: "));
+                                output.writeTextElement("span", extradata.color.ground);
+                                output.writeEndElement();
+                            } else {
+                                groundcolor.value = "";
+                            }
                         } else {
                             wholecolor.value = "";
-                        }
-                        if(extradata.color.ground) {
-                            groundcolor.value = extradata.color.ground;
-                            output.writeStartElement("p");
-                            output.writeTextElement("strong", TTR("batchDetails", "Ground: "));
-                            output.writeTextElement("span", extradata.color.ground);
-                            output.writeEndElement();
-                        } else {
                             groundcolor.value = "";
                         }
                     } else {
                         wholecolor.value = "";
                         groundcolor.value = "";
                     }
-                } else {
-                    wholecolor.value = "";
-                    groundcolor.value = "";
-                }
-                output.writeStartElement("p");
-                output.writeTextElement("strong", TTR("batchDetails", "Approved: "));
-                output.writeCharacters(query.value(6));
-                output.writeEndElement();
-                output.writeStartElement("p");
-                output.writeTextElement("strong", TTR("batchDetails", "Files: "));
-                output.writeCharacters(query.value(7));
-                output.writeEndElement();
-                output.writeStartElement("p");
-                output.writeTextElement("strong", TTR("batchDetails", "Annotations:"));
-                var files = sqlToArray(query.value(7));
-                var annotations = annotationFromRecord(files[0]);
-                fileID = files[0];
-                var buffer2 = new QBuffer("<points>"+annotations+"</points>");
-                buffer2.open(1);
-                var colQuery = new XQuery;
-                colQuery.bind("profile", buffer2);
-                colQuery.setQuery('for $i in doc($profile)//tuple[1]/temperature/@series return (string($i), ";")');
-                var result = colQuery.exec();
-                buffer2.close();
-                var seriesHeaders = new Array();
-                seriesHeaders.push(TTR("batchDetails", "Time"));
-                var records = result.split(";");
-                for(var i = 0; i < records.length - 1; i++) {
-                    seriesHeaders.push(records[i].replace(/^\s+|\s+$/g,""));
-                }
-                seriesHeaders.push(TTR("batchDetails", "Note"));
-                output.writeStartElement("table");
-                output.writeStartElement("thead");
-                output.writeStartElement("tr");
-                for(var i = 0; i < seriesHeaders.length; i++) {
-                    output.writeTextElement("th", seriesHeaders[i]);
-                }
-                output.writeEndElement();
-                output.writeEndElement();
-                buffer2.open(1);
-                var rq = 'for $t in doc($profile) //tuple return (string($t/time), ";", ';
-                for(var i = 0; i < seriesHeaders.length - 2; i++) {
-                    rq += 'string($t/temperature[' + Number(i+1) + ']), ";", ';
-                }
-                rq += 'string($t/annotation), "~")';
-                colQuery.setQuery(rq);
-                var annotationData = colQuery.exec();
-                colQuery = colQuery.invalidate();
-                buffer2.close();
-                output.writeStartElement("tbody");
-                var annotationRecords = annotationData.split("~");
-                for(var i = 0; i < annotationRecords.length - 1; i++) {
+                    output.writeStartElement("p");
+                    output.writeTextElement("strong", TTR("batchDetails", "Approved: "));
+                    output.writeCharacters(query.value(6));
+                    output.writeEndElement();
+                    output.writeStartElement("p");
+                    output.writeTextElement("strong", TTR("batchDetails", "Files: "));
+                    output.writeCharacters(query.value(7));
+                    output.writeEndElement();
+                    output.writeStartElement("p");
+                    output.writeTextElement("strong", TTR("batchDetails", "Annotations:"));
+                    var files = sqlToArray(query.value(7));
+                    var annotations = annotationFromRecord(files[0]);
+                    fileID = files[0];
+                    var buffer2 = new QBuffer("<points>"+annotations+"</points>");
+                    buffer2.open(1);
+                    var colQuery = new XQuery;
+                    colQuery.bind("profile", buffer2);
+                    colQuery.setQuery('for $i in doc($profile)//tuple[1]/temperature/@series return (string($i), ";")');
+                    var result = colQuery.exec();
+                    buffer2.close();
+                    var seriesHeaders = new Array();
+                    seriesHeaders.push(TTR("batchDetails", "Time"));
+                    var records = result.split(";");
+                    for(var i = 0; i < records.length - 1; i++) {
+                        seriesHeaders.push(records[i].replace(/^\s+|\s+$/g,""));
+                    }
+                    seriesHeaders.push(TTR("batchDetails", "Note"));
+                    output.writeStartElement("table");
+                    output.writeStartElement("thead");
                     output.writeStartElement("tr");
-                    var annotationRow = annotationRecords[i].split(";");
-                    for(var j = 0; j < annotationRow.length; j++) {
-                        output.writeStartElement("td");
-                        output.writeAttribute("style", "border-left: 1px solid #000000");
-                        if(j > 0) {
-                            output.writeAttribute("align", "center");
-                        }
-                        if(j > 0 && j < annotationRow.length - 1) {
-                            output.writeCharacters(Number(annotationRow[j].replace(/^\s+|\s+$/g,"")).toFixed(2));
-                        } else {
-                            output.writeCharacters(annotationRow[j].replace(/^\s+|\s+$/g,""));
+                    for(var i = 0; i < seriesHeaders.length; i++) {
+                        output.writeTextElement("th", seriesHeaders[i]);
+                    }
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    buffer2.open(1);
+                    var rq = 'for $t in doc($profile) //tuple return (string($t/time), ";", ';
+                    for(var i = 0; i < seriesHeaders.length - 2; i++) {
+                        rq += 'string($t/temperature[' + Number(i+1) + ']), ";", ';
+                    }
+                    rq += 'string($t/annotation), "~")';
+                    colQuery.setQuery(rq);
+                    var annotationData = colQuery.exec();
+                    colQuery = colQuery.invalidate();
+                    buffer2.close();
+                    output.writeStartElement("tbody");
+                    var annotationRecords = annotationData.split("~");
+                    for(var i = 0; i < annotationRecords.length - 1; i++) {
+                        output.writeStartElement("tr");
+                        var annotationRow = annotationRecords[i].split(";");
+                        for(var j = 0; j < annotationRow.length; j++) {
+                            output.writeStartElement("td");
+                            output.writeAttribute("style", "border-left: 1px solid #000000");
+                            if(j > 0) {
+                                output.writeAttribute("align", "center");
+                            }
+                            if(j > 0 && j < annotationRow.length - 1) {
+                                output.writeCharacters(Number(annotationRow[j].replace(/^\s+|\s+$/g,"")).toFixed(2));
+                            } else {
+                                output.writeCharacters(annotationRow[j].replace(/^\s+|\s+$/g,""));
+                            }
+                            output.writeEndElement();
                         }
                         output.writeEndElement();
                     }
                     output.writeEndElement();
-                }
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeCharacters(query.value(8));
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeEndElement();
-                output.writeEndDocument();
-                dataView.setContent(buffer);
-                buffer.close();
-                log.clear();
-                graph.clear();
-                var buffer3 = new QBuffer(query.value(9));
-                var input = new XMLInput(buffer3, 1);
-                input.newTemperatureColumn.connect(log.setHeaderData);
-                input.newAnnotationColumn.connect(log.setHeaderData);
-                var lc;
-                input.lastColumn.connect(function(c) {
-                    lc = c;
-                    if(c < 3) {
-                        log.setHeaderData(3, "");
+                    output.writeEndElement();
+                    output.writeCharacters(query.value(8));
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    output.writeEndElement();
+                    output.writeEndDocument();
+                    dataView.setContent(buffer);
+                    buffer.close();
+                    log.clear();
+                    graph.clear();
+                    var buffer3 = new QBuffer(query.value(9));
+                    var input = new XMLInput(buffer3, 1);
+                    input.newTemperatureColumn.connect(log.setHeaderData);
+                    input.newAnnotationColumn.connect(log.setHeaderData);
+                    var lc;
+                    input.lastColumn.connect(function(c) {
+                        lc = c;
+                        if(c < 3) {
+                            log.setHeaderData(3, "");
+                        }
+                    });
+                    input.measure.connect(graph.newMeasurement);
+                    input.measure.connect(log.newMeasurement);
+                    input.annotation.connect(function(note,tcol,ncol) {
+                        for(var i = tcol; i < ncol; i++) {
+                            log.newAnnotation(note, i, ncol);
+                        }
+                    });
+                    graph.updatesEnabled = false;
+                    log.updatesEnabled = false;
+                    input.input();
+                    log.updatesEnabled = true;
+                    graph.updatesEnabled = true;
+                    log.newAnnotation("End", 1, lc);
+                    if(query.value(6) == "true") {
+                        approvalButton.checked = true;
                     }
-                });
-                input.measure.connect(graph.newMeasurement);
-                input.measure.connect(log.newMeasurement);
-                input.annotation.connect(function(note,tcol,ncol) {
-                    for(var i = tcol; i < ncol; i++) {
-                        log.newAnnotation(note, i, ncol);
+                    annotationField.plainText = query.value(8);
+                    unitEdit.text = unitText;
+                    roastedEdit.text = query.value(5);
+                    drawTag(query.value(11), query.value(0));
+                } else {
+                    print("Something is wrong with batch data on machine " + machine + " at time " + batchTime);
+                    print("Attempting alternate query. Edit and Batch Tag tabs will not work.");
+                    query.prepare("SELECT unroasted_id, unroasted_quantity, unroasted_total_quantity, roasted_id, roasted_quantity, transaction_type, annotation, duration, approval, files, person, additional_data FROM roasting_log WHERE time = :tref AND machine = :mref");
+                    query.bind(":tref", batchTime);
+                    query.bind(":mref", machine);
+                    query.exec();
+                    if(query.next()) {
+                        var buffer = new QBuffer;
+                        buffer.open(3);
+                        var output = new XmlWriter(buffer);
+                        output.writeStartDocument("1.0");
+                        output.writeDTD('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg.dtd">');
+                        output.writeStartElement("html");
+                        output.writeAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+                        output.writeStartElement("head");
+                        output.writeTextElement("title", "Batch Details");
+                        output.writeEndElement();
+                        output.writeStartElement("body");
+                        output.writeTextElement("p", "Something is wrong with the data for this batch. Falling back to a less detailed view.");
+                        output.writeTextElement("p", "unroasted_id: " + query.value(0));
+                        output.writeTextElement("p", "unroasted_quantity: " + query.value(1));
+                        output.writeTextElement("p", "unroasted_total_quantity: " + query.value(2));
+                        output.writeTextElement("p", "roasted_id: " + query.value(3));
+                        output.writeTextElement("p", "roasted_quantity: " + query.value(4));
+                        output.writeTextElement("p", "transaction_type: " + query.value(5));
+                        output.writeTextElement("p", "annotation: " + query.value(6));
+                        output.writeTextElement("p", "duration: " + query.value(7));
+                        output.writeTextElement("p", "approval: " + query.value(8));
+                        output.writeTextElement("p", "files: " + query.value(9));
+                        var files = sqlToArray(query.value(9));
+                        fileID = files[0];
+                        output.writeTextElement("p", "person: " + query.value(10));
+                        output.writeTextElement("p", "additional_data: " + query.value(11));
+                        output.writeEndElement();
+                        output.writeEndElement();
+                        output.writeEndDocument();
+                        dataView.setContent(buffer);
+                        buffer.close();
+                        query.prepare("SELECT file FROM files WHERE id = :id");
+                        query.bind(":id", fileID);
+                        query.exec();
+                        if(query.next())
+                        {
+                            var buffer = new QBuffer(query.value(0));
+                            var input = new XMLInput(buffer, 1);
+                            input.newTemperatureColumn.connect(log.setHeaderData);
+                            input.newAnnotationColumn.connect(log.setHeaderData);
+                            var lc;
+                            input.lastColumn.connect(function(c) {
+                                lc = c;
+                                if(c < 3) {
+                                    log.setHeaderData(3, "");
+                                }
+                            });
+                            input.measure.connect(graph.newMeasurement);
+                            input.measure.connect(log.newMeasurement);
+                            input.annotation.connect(function(note,tcol,ncol) {
+                                for(var i = tcol; i < ncol; i++) {
+                                    log.newAnnotation(note, i, ncol);
+                                }
+                            });
+                            graph.updatesEnabled = false;
+                            log.updatesEnabled = false;
+                            input.input();
+                            log.updatesEnabled = true;
+                            graph.updatesEnabled = true;
+                            log.newAnnotation("End", 1, lc);
+                        }
+                    } else {
+                        var buffer = new QBuffer;
+                        buffer.open(3);
+                        var output = new XmlWriter(buffer);
+                        output.writeStartDocument("1.0");
+                        output.writeDTD('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg.dtd">');
+                        output.writeStartElement("html");
+                        output.writeAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+                        output.writeStartElement("head");
+                        output.writeTextElement("title", "Batch Details");
+                        output.writeEndElement();
+                        output.writeStartElement("body");
+                        output.writeTextElement("p", "Record not found on machine: " + machine + " at time: " + batchTime);
+                        output.writeEndElement();
+                        output.writeEndElement();
+                        output.writeEndDocument();
+                        dataView.setContent(buffer);
+                        buffer.close();
                     }
-                });
-                graph.updatesEnabled = false;
-                log.updatesEnabled = false;
-                input.input();
-                log.updatesEnabled = true;
-                graph.updatesEnabled = true;
-                log.newAnnotation("End", 1, lc);
-                if(query.value(6) == "true") {
-                    approvalButton.checked = true;
                 }
-                annotationField.plainText = query.value(8);
-                unitEdit.text = unitText;
-                roastedEdit.text = query.value(5);
-                drawTag(query.value(11), query.value(0));
                 query = query.invalidate();
             }
             var saveMenu = findChildObject(this, 'save');
