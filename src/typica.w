@@ -5989,6 +5989,28 @@ void addSaltToLayout(QDomElement element, QStack<QWidget *> *,@|
     {
         view->setObjectName(element.attribute("id"));
     }
+    if(element.hasAttribute("editable"))
+    {
+        if(element.attribute("editable") == "false")
+        {
+            view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        }
+    }
+    if(element.hasAttribute("selectionBehavior"))
+    {
+        if(element.attribute("selectionBehavior") == "items")
+        {
+            view->setSelectionBehavior(QAbstractItemView::SelectItems);
+        }
+        else if(element.attribute("selectionBehavior") == "rows")
+        {
+            view->setSelectionBehavior(QAbstractItemView::SelectRows);
+        }
+        else if(element.attribute("selectionBehavior") == "columns")
+        {
+            view->setSelectionBehavior(QAbstractItemView::SelectColumns);
+        }
+    }
     if(element.hasChildNodes())
     {
         QDomNodeList children = element.childNodes();
