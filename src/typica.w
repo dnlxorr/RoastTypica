@@ -689,6 +689,12 @@ template<> QTime getself(QScriptContext *context)
     return self;
 }
 
+template<> QModelIndex getself(QScriptContext *context)
+{
+    QModelIndex self = context->thisObject().toVariant().value<QModelIndex>();
+    return self;
+}
+
 template<> QByteArray getself(QScriptContext *context)
 {
     QByteArray self = context->thisObject().toVariant().toByteArray();
@@ -16363,11 +16369,13 @@ we declare that as a metatype.
 Q_DECLARE_METATYPE(QModelIndex)
 
 @ Next we need a pair of functions to convert |QModelIndex| to and from script
-values.
+values. Some |QModelIndex| methods are also exposed to the host environment.
 
 @<Function prototypes for scripting@>=
 QScriptValue QModelIndex_toScriptValue(QScriptEngine *engine, const QModelIndex &index);
 void QModelIndex_fromScriptValue(const QScriptValue &value, QModelIndex &index);
+void setQModelIndexProperties(QScriptValue value, QScriptEngine *engine);
+QScriptValue QModelIndex_row(QScriptContext *context, QScriptEngine *engine);
 
 @ These are implemented thusly.
 
@@ -16377,12 +16385,24 @@ QScriptValue QModelIndex_toScriptValue(QScriptEngine *engine, const QModelIndex 
     QVariant var;
     var.setValue(index);
     QScriptValue object = engine->newVariant(var);
+    setQModelIndexProperties(object, engine);
     return object;
 }
 
 void QModelIndex_fromScriptValue(const QScriptValue &value, QModelIndex &index)
 {
     index = value.toVariant().value<QModelIndex>();
+}
+
+void setQModelIndexProperties(QScriptValue value, QScriptEngine *engine)
+{
+    value.setProperty("row", engine->newFunction(QModelIndex_row));
+}
+
+QScriptValue QModelIndex_row(QScriptContext *context, QScriptEngine *engine)
+{
+    QModelIndex self = getself<QModelIndex>(context);
+    return QScriptValue(engine, self.row());
 }
 
 @ Finally we register this with the engine.
