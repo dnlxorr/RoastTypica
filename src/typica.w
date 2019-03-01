@@ -4682,6 +4682,8 @@ void populateWidget(QDomElement element, QStack<QWidget *> *widgetStack,@|
                     QStack<QLayout *> *layoutStack);
 void populateStackedLayout(QDomElement element, QStack<QWidget *> *widgetStack,
                            QStack<QLayout *> *layoutStack);
+void populateFormLayout(QDomElement element, QStack<QWidget *> *widgetStack,@|
+                        QStack<QLayout *> *layoutStack);
 void addTemperatureDisplayToSplitter(QDomElement element,@|
                                      QStack<QWidget *> *widgetStack,
                                      QStack<QLayout *> *layoutStack);
@@ -5026,6 +5028,12 @@ else if(layoutType == "stack")
     layoutStack->push(layout);
     populateStackedLayout(element, widgetStack, layoutStack);
 }
+else if(layoutType == "form")
+{
+    layout = new QFormLayout;
+    layoutStack->push(layout);
+    populateFormLayout(element, widgetStack, layoutStack);
+}
 if(element.hasAttribute("id"))
 {
     layout->setObjectName(element.attribute("id"));
@@ -5038,6 +5046,47 @@ if(element.hasAttribute("margin"))
 {
     int m = element.attribute("margin").toInt();
     layout->setContentsMargins(m, m, m, m);
+}
+
+@ Any direct child of a form layout must be a {\tt <row>} element to specify
+the label for the given row. The field for the given row will always be a
+|QVBoxLayout| containing whatever is specified by children of the {\tt <row>}.
+
+@<Functions for scripting@>=
+void populateFormLayout(QDomElement element, QStack<QWidget *> *widgetStack,
+                        QStack<QLayout *> *layoutStack)
+{
+    QDomNodeList children = element.childNodes();
+    QFormLayout *layout = qobject_cast<QFormLayout *>(layoutStack->top());
+    for(int i = 0; i < children.count(); i++)
+    {
+        QDomNode current;
+        QDomElement currentElement;
+        current = children.at(i);
+        if(current.isElement())
+        {
+            currentElement = current.toElement();
+            if(currentElement.tagName() == "row")
+            {
+                QString label = QString();
+                if(currentElement.hasAttribute("label"))
+                {
+                    label = currentElement.attribute("label");
+                }
+                QVBoxLayout *childLayout = new QVBoxLayout;
+                layoutStack->push(childLayout);
+                populateBoxLayout(currentElement, widgetStack, layoutStack);
+                if(label.isEmpty())
+                {
+                    layout->addRow(childLayout);
+                }
+                else
+                {
+                    layout->addRow(label, childLayout);
+                }
+            }
+        }
+    }
 }
 
 @ Stacked layouts are a bit different from the other types. A stacked layout has
