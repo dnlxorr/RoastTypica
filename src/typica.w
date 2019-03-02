@@ -13884,6 +13884,7 @@ SqlComboBox::SqlComboBox() :
     specialNullText(tr("Unknown")), specialNullData(QVariant::String)
 {
     view()->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    setMinimumContentsLength(20);
 }
 
 SqlComboBox::~SqlComboBox()
