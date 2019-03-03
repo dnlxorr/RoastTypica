@@ -6153,6 +6153,13 @@ if(currentElement.hasAttribute("display"))
 {
     widget->setDisplayColumn(currentElement.attribute("display").toInt());
 }
+if(currentElement.hasAttribute("editable"))
+{
+    if(currentElement.attribute("editable") == "true")
+    {
+        widget->setEditable(true);
+    }
+}
 widget->addSqlOptions(currentElement.text());
 delegate->setWidget(widget);
 view->setItemDelegateForColumn(currentColumn, delegate);
@@ -13372,7 +13379,7 @@ class SaltModel : public QAbstractItemModel@/
     public:@/
         SaltModel(int columns);
         ~SaltModel();
-        int rowCount(const QModelIndex &parent = QModelIndex()) const;
+        Q_INVOKABLE int rowCount(const QModelIndex &parent = QModelIndex()) const;
         int columnCount(const QModelIndex &parent = QModelIndex()) const;
         bool setHeaderData(int section, Qt::Orientation@, orientation,
                            const QVariant &value, int role = Qt::DisplayRole);
@@ -13932,7 +13939,12 @@ QWidget* SqlComboBoxDelegate::createEditor(QWidget *parent,@|
                                            const QStyleOptionViewItem &,
                                            const QModelIndex &) const
 {
-    return delegate->clone(parent);
+    SqlComboBox *retval = delegate->clone(parent);
+    if(delegate->isEditable())
+    {
+        retval->setEditable(true);
+    }
+    return retval;
 }
 
 @ To set the appropriate editor data, we check the value in the model and
@@ -13957,9 +13969,9 @@ void SqlComboBoxDelegate::setModelData(QWidget *editor,@|
                                        const QModelIndex &index) const
 {
     SqlComboBox *self = qobject_cast<SqlComboBox *>(editor);
+    model->setData(index, self->currentText(), Qt::DisplayRole);
     model->setData(index, self->itemData(self->currentIndex(), Qt::UserRole),
                    Qt::UserRole);
-    model->setData(index, self->currentText(), Qt::DisplayRole);
 }
 
 @ This is needed to play nicely with the model view architecture.
