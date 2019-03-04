@@ -3516,11 +3516,19 @@ QScriptValue constructQTime(QScriptContext *context,
         {@t\1@>@/
             case 4:@/
                 arg4 = argument<int>(3, context);
+                arg3 = argument<int>(2, context);
+                arg2 = argument<int>(1, context);
+                arg1 = argument<int>(0, context);
+                break;
             case 3:@/
                 arg3 = argument<int>(2, context);
+                arg2 = argument<int>(1, context);
+                arg1 = argument<int>(0, context);
+                break;
             case 2:@/
                 arg2 = argument<int>(1, context);
                 arg1 = argument<int>(0, context);
+                break;
             default:@/
                 break;@t\2@>@/
         }
@@ -3859,10 +3867,15 @@ QScriptValue QTime_setHMS(QScriptContext *context, QScriptEngine *engine)
         {@t\1@>@/
             case 4:@/
                 arg4 = argument<int>(3, context);
+                arg3 = argument<int>(2, context);
+                arg2 = argument<int>(1, context);
+                arg1 = argument<int>(0, context);
+                break;
             case 3:@/
                 arg3 = argument<int>(2, context);
                 arg2 = argument<int>(1, context);
                 arg1 = argument<int>(0, context);
+                break;
             default:@/
                 break;@t\2@>@/
         }

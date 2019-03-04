@@ -562,7 +562,7 @@ void ModbusNG::dataAvailable()
         float floatresponse;
         char *ibytes = (char*)&intresponse;
         char *fbytes = (char*)&floatresponse;
-        double output;
+        double output = 0.0;
         switch(scanList.at(scanPosition).format)
         {
             case Int16:
