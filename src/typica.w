@@ -4757,6 +4757,7 @@ multitude of objects, all of which must be passed to the scripting engine.
 QScriptValue createWindow(QScriptContext *context, QScriptEngine *engine)@/
 {
     QString targetID = argument<QString>(0, context);
+    @<Get window arguments@>@;
     QDomNode element;
     QScriptValue object;
     @<Find the window element@>@;
@@ -4777,6 +4778,7 @@ window with a reports menu has been created.
 QScriptValue createReport(QScriptContext *context, QScriptEngine *engine)
 {
     QString targetID = argument<QString>(0, context);
+    @<Get window arguments@>@;
     QFile file(QString("reports:%1").arg(targetID));
     QScriptValue object;
     if(file.open(QIODevice::ReadOnly))
@@ -4791,6 +4793,18 @@ QScriptValue createReport(QScriptContext *context, QScriptEngine *engine)
         file.close();
     }
     return object;
+}
+
+@ Sometimes it is useful to pass information to a window when it is created.
+A 2nd optional argument to window creation functions can be any script value
+which will be made available under the {\tt arguments} property of the newly
+created window.
+
+@<Get window arguments@>=
+QScriptValue arguments;
+if(context->argumentCount() > 1)
+{
+    arguments = context->argument(1);
 }
 
 @ First we must locate the {\tt <window>} element. The most sensible way to do
@@ -4837,6 +4851,7 @@ ScriptQMainWindow *window = new ScriptQMainWindow;
 window->setObjectName(targetID);
 object = engine->newQObject(window);
 setQMainWindowProperties(object, engine);
+object.setProperty("arguments", arguments);
 QWidget *central = new(QWidget);
 central->setParent(window);
 central->setObjectName("centralWidget");
@@ -14600,6 +14615,7 @@ void ReportAction::createReport()
         QScriptContext *context = engine->pushContext();
         QScriptValue object;
         QString targetID = reportFile;
+        QScriptValue arguments;
         @<Display the window@>@;
         file.close();
         engine->popContext();
