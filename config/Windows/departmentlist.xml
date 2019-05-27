@@ -1,0 +1,39 @@
+<window id="departmentlist">
+    <layout type="vertical">
+        <layout type="horizontal">
+            <!-- Reserved for filters, &c. -->
+        </layout>
+        <sqlview id="departments" />
+    </layout>
+    <menu name="File">
+        <item id="newdepartment">New Department</item>
+    </menu>
+    <program>
+        <![CDATA[
+var window = this;
+this.windowTitle = TTR("departmentlist", "Typica - Department List");
+var departments = findChildObject(this, "departments");
+var update = function() {
+    departments.setQuery("SELECT id, name FROM depts ORDER BY id");
+};
+update();
+//var notification = Application.subscribe("deptschange");
+//notification.notify.connect(update);
+departments.openEntryRow.connect(function(row) {
+    var args = new Object;
+    args.newDepartment = false;
+    args.currentName = departments.data(row, 1);
+    args.departmentId = departments.data(row, 0);
+    args.updateCallback = update;
+    createWindow("renamedepartment", args);
+});
+var newdepartment = findChildObject(this, "newdepartment");
+newdepartment.triggered.connect(function() {
+    var args = new Object;
+    args.newDepartment = true;
+    args.updateCallback = update;
+    createWindow("renamedepartment", args);
+});
+        ]]>
+    </program>
+</window>

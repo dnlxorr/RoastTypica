@@ -4,11 +4,6 @@
     <layout type="grid">
         <row>
             <column>
-                <button name="Configure Roasters" id="configure" type="push" />
-            </column>
-        </row>
-        <row>
-            <column>
                 <button name="Roasting Schedule" id="schedule" type="push" />
             </column>
         </row>
@@ -81,13 +76,17 @@
     <webview id="dashboard" stretch="1" />
     </layout>
     <menu name="Reports" type="reports" src="Reports" />
-    <menu name="Database">
-        <item id="resetconnection">Forget Connection Details</item>
-    </menu>
 	<menu name="Users">
 		<item id="switchuser">Switch User</item>
 		<item id="createuser">Create New Users</item>
 	</menu>
+    <menu name="Settings">
+        <item id="resetconnection">Forget Database Connection</item>
+        <item id="configure">Preferences</item>
+    </menu>
+    <menu name="Lists">
+        <item id="departmentlist">Department List</item>
+    </menu>
     <program>
         var window = this;
         var navigationwindow = window;
@@ -182,10 +181,14 @@
                 window.loggingWindow.activateWindow();
             }
         });
-        var configurebutton = findChildObject(this, 'configure');
-        configurebutton.clicked.connect(function() {
+        var configure = findChildObject(this, 'configure');
+        configure.triggered.connect(function() {
             var confwindow = new SettingsWindow;
             confwindow.show();
+        });
+        var departmentlist = findChildObject(this, 'departmentlist');
+        departmentlist.triggered.connect(function() {
+            createWindow("departmentlist");
         });
         <![CDATA[
             var DBCreateBase = function() {

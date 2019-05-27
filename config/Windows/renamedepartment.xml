@@ -1,0 +1,38 @@
+<window id="renamedepartment">
+    <layout type="vertical">
+        <layout type="horizontal">
+            <label>Department Name:</label>
+            <line id="namefield" />
+        </layout>
+        <layout type="horizontal">
+            <button name="Save" type="push" id="save" />
+        </layout>
+    </layout>
+    <program>
+        <![CDATA[
+var window = this;
+this.windowTitle = "Typica - Set Department Name";
+var namefield = findChildObject(this, "namefield");
+if(this.arguments.newDepartment) {
+    namefield.text = "New Department";
+} else {
+    namefield.text = this.arguments.currentName;
+}
+var save = findChildObject(this, "save");
+save.clicked.connect(function() {
+    var query = new QSqlQuery();
+    if(window.arguments.newDepartment) {
+        query.prepare("INSERT INTO depts(id, name) VALUES (default, :name)");
+    } else {
+        query.prepare("UPDATE depts SET name = :name WHERE id = :id");
+        query.bind(":id", window.arguments.departmentId);
+    }
+    query.bind(":name", namefield.text);
+    query.exec();
+    query.invalidate();
+    window.arguments.updateCallback();
+    window.close();
+});
+        ]]>
+    </program>
+</window>
