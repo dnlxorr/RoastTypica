@@ -21,7 +21,7 @@
     <include src="Windows/cuppingformsbysession.xml" />
     <include src="Windows/cuppingsessionsummary.xml" />
     <include src="Windows/cuppingsummary.xml" />
-    <include src="Windows/purchase.xml" />
+    <include src="Windows/purchase2.xml" />
     <include src="Windows/invoiceinfo.xml" />
     <include src="Windows/editinvoice.xml" />
     <include src="Windows/editinvoiceitem.xml" />
@@ -36,8 +36,10 @@
 	<include src="Windows/manuallogentry.xml" />
     <include src="Windows/schedule.xml" />
 	<include src="Windows/editinventorytransaction.xml" />
+    <include src="Windows/departmentlist.xml" />
+    <include src="Windows/renamedepartment.xml" />
     <program>
-        <![CDATA[
+        <![CDATA[        
             Windows = new Object();
             var loggingWindow;
             var currentBatchInfo;

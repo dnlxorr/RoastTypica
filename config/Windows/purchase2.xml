@@ -1,0 +1,314 @@
+<window id="purchase">
+    <layout type="vertical">
+        <layout type="horizontal">
+            <label>Date:</label>
+            <calendar id="date" />
+            <label>Vendor:</label>
+            <sqldrop data="0" display="0" showdata="false" editable="true" id="vendor">
+                <query>SELECT DISTINCT vendor FROM purchase UNION SELECT '' ORDER BY vendor ASC</query>
+            </sqldrop>
+            <label>Invoice:</label>
+            <line id="invoice" />
+            <stretch />
+        </layout>
+        <layout type="stack" id="pages">
+            <page>
+                <layout type="vertical">
+                    <sqltablearray columns="15" id="orderdetails" editable="false" selectionBehavior="rows">
+                        <column name="ID" />
+                        <column name="Bags" />
+                        <column name="Name" />
+                        <column name="Cost" />
+                        <column name="Bag Weight" />
+                        <column name="Total Cost" />
+                        <column name="Certifications" />
+                        <column name="Attributes" />
+                        <column name="Type" />
+                        <column name="Update" />
+                        <column name="Old Name" />
+                        <column name="Old Cost" />
+                        <column name="Origin" />
+                        <column name="Decaf" />
+                        <column name="Decaf Method" />
+                    </sqltablearray>
+                </layout>
+            </page>
+            <page>
+                <layout type="horizontal">
+                    <stretch />
+                    <layout type="vertical">
+                        <stretch />
+                        <button name="New Item" type="push" id="newItem" />
+                        <button name="New Fee" type="push" id="newFee" />
+                        <button name="Cancel" type="push" id="newCancel" />
+                        <stretch />
+                    </layout>
+                    <stretch />
+                </layout>
+            </page>
+            <page>
+                <layout type="vertical">
+                    <tabbar id="tabs" />
+                    <layout type="stack" id="itemStack">
+                        <page>
+                            <layout type="form">
+                                <row label="Number of Bags">
+                                    <line id="itemBags" validator="numeric" />
+                                </row>
+                                <row label="Item Name">
+                                    <sqldrop data="0" display="0" showdata="false" editable="true" id="itemName">
+                                        <query>SELECT DISTINCT name FROM coffees UNION SELECT '' ORDER BY name ASC</query>
+                                    </sqldrop>
+                                </row>
+                                <row label="Origin">
+                                    <sqldrop data="0" display="0" showdata="false" editable="true" id="itemOrigin">
+                                        <query>SELECT DISTINCT origin FROM coffees UNION SELECT '' ORDER BY origin ASC</query>
+                                    </sqldrop>
+                                </row>
+                                <row label="Quantity">
+                                    <layout type="horizontal">
+                                        <line id="itemQuantity" validator="numeric" />
+                                        <sqldrop id="units" />
+                                        <sqldrop id="quantityDivision" />
+                                    </layout>
+                                </row>
+                                <row label="Cost">
+                                    <layout type="horizontal">
+                                        <line id="itemCost" validator="numeric" />
+                                        <sqldrop id="costDivision" />
+                                    </layout>
+                                </row>
+                                <row label="Decaffeination">
+                                    <layout type="horizontal">
+                                        <button type="check" id="isDecaf" name="Decaffeinated" />
+                                        <label>Decaffeination Method</label>
+                                        <sqldrop data="0" display="0" showdata="false" editable="true" id="decafMethod">
+                                            <query>SELECT DISTINCT decaf_method FROM decaf_coffees UNION SELECT '' ORDER BY decaf_method ASC</query>
+                                        </sqldrop>
+                                    </layout>
+                                </row>
+                            </layout>
+                        </page>
+                        <page>
+                            <layout type="vertical">
+                                <sqltablearray columns="1" id="itemCertifications">
+                                    <column name="Certification" delegate="sql" showdata="false" data="0" display="0" editable="true">SELECT DISTINCT certification FROM certifications UNION SELECT '' ORDER BY certification ASC</column>
+                                </sqltablearray>
+                            </layout>
+                        </page>
+                        <page>
+                            <layout type="vertical">
+                                <sqltablearray columns="2" id="itemAttributes">
+                                    <column name="Attribute" delegate="sql" showdata="false" data="0" display="0">SELECT DISTINCT name FROM item_attributes UNION SELECT '' ORDER BY name ASC</column>
+                                    <column name="Value" />
+                                </sqltablearray>
+                            </layout>
+                        </page>
+                    </layout>
+                    <layout type="horizontal">
+                        <button name="Cancel" type="push" id="itemCancel" />
+                        <button name="Delete" type="push" id="itemDelete" />
+                        <stretch />
+                        <button name="Save" type="push" id="itemSave" />
+                    </layout>
+                </layout>
+            </page>
+            <page>
+                <layout type="horizontal">
+                    <stretch />
+                    <layout type="vertical">
+                        <stretch />
+                        <layout type="form">
+                            <row label="Description: ">
+                                <line id="feeDescription" />
+                            </row>
+                            <row label="Price: ">
+                                <line id="feePrice" />
+                            </row>
+                        </layout>
+                        <stretch />
+                        <layout type="horizontal">
+                            <button name="Cancel" type="push" id="feeCancel" />
+                            <button name="Delete" type="push" id="feeDelete" />
+                            <stretch />
+                            <button name="Save" type="push" id="feeSave" />
+                        </layout>
+                        <stretch />
+                    </layout>
+                    <stretch />
+                </layout>
+            </page>
+        </layout>
+        <stretch />
+    </layout>
+    <program>
+        <![CDATA[
+var window = this;
+this.windowTitle = TTR("purchase", "Typica - Coffee Purchase");
+var pages = findChildObject(this, 'pages');
+pages.setCurrentIndex(0);
+var table = findChildObject(this, 'orderdetails');
+// table.hideColumn(6);
+table.hideColumn(7);
+table.hideColumn(8);
+table.hideColumn(9);
+table.hideColumn(10);
+table.hideColumn(11);
+table.hideColumn(12);
+table.hideColumn(13);
+table.hideColumn(14);
+table.resizeColumnsToContents();
+var units = findChildObject(this, 'units');
+units.addItem("Lb");
+units.addItem("Kg");
+var quantityDivision = findChildObject(this, 'quantityDivision');
+quantityDivision.addItem("Total");
+quantityDivision.addItem("Per Bag");
+var costDivision = findChildObject(this, 'costDivision');
+costDivision.addItem("Total");
+costDivision.addItem("Per Unit");
+var isDecaf = findChildObject(this, 'isDecaf');
+var decafMethod = findChildObject(this, 'decafMethod');
+var itemCertifications = findChildObject(this, 'itemCertifications');
+var itemAttributes = findChildObject(this, 'itemAttributes');
+var currentRow;
+table.doubleClicked.connect(function(index) {
+    currentRow = index.row();
+    var type = table.data(currentRow, 8, 0);
+    if(type == "PURCHASE") {
+        loadItemPage();
+    } else if(type == "FEE") {
+        loadFeePage();
+    } else {
+        pages.setCurrentIndex(1);
+    }
+});
+var tabs = findChildObject(this, 'tabs');
+tabs.addTab(TTR("purchase", "Required Details"));
+tabs.addTab(TTR("purchase", "Certifications"));
+tabs.addTab(TTR("purchase", "Attributes"));
+var itemStack = findChildObject(this, 'itemStack');
+tabs.currentChanged.connect(function(index) {
+    itemStack.setCurrentIndex(index);
+});
+function loadItemPage() {
+    pages.setCurrentIndex(2);
+}
+var newItem = findChildObject(this, 'newItem');
+newItem.clicked.connect(function() {
+    pages.setCurrentIndex(2);
+});
+var itemBags = findChildObject(this, 'itemBags');
+var itemName = findChildObject(this, 'itemName');
+var itemOrigin = findChildObject(this, 'itemOrigin');
+var itemQuantity = findChildObject(this, 'itemQuantity');
+var itemCost = findChildObject(this, 'itemCost');
+var itemSave = findChildObject(this, 'itemSave');
+function itemClear() {
+    itemBags.text = '';
+    itemName.currentText = '';
+    itemOrigin.currentText = '';
+    itemCost.text = '';
+    itemQuantity.text = '';
+    pages.setCurrentIndex(0);
+}
+var itemCancel = findChildObject(this, 'itemCancel');
+itemCancel.clicked.connect(function() {
+    itemClear();
+});
+itemSave.clicked.connect(function() {
+    if(table.data(currentRow, 9, 0) == "NOP") {
+        table.setData(currentRow, 0, "UPDATE", 0);
+    } else {
+        table.setData(currentRow, 9, "INSERT", 0);
+    }
+    table.setData(currentRow, 8, "PURCHASE", 0);
+    table.setData(currentRow, 1, itemBags.text, 0);
+    table.setData(currentRow, 2, itemName.currentText, 0);
+    table.setData(currentRow, 12, itemOrigin.currentText, 0);
+    var factor = 1;
+    if(units.currentIndex == 1) {
+        factor = 2.2;
+    }
+    if(costDivision.currentIndex == 1) {
+        table.setData(currentRow, 3, Number(itemCost.text)/factor, 0);
+    } else {
+        if(quantityDivision.currentIndex == 0) {
+            table.setData(currentRow, 3, Number(itemCost.text)/Number(itemQuantity.text)/factor, 0);
+        } else {
+            table.setData(currentRow, 3, Number(itemCost.text)/(Number(itemQuantity.text)*Number(itemBags.text))/factor, 0);
+        }
+    }
+    if(quantityDivision.currentIndex == 1) {
+        table.setData(currentRow, 4, Number(itemQuantity.text)/factor, 0);
+    } else {
+        table.setData(currentRow, 4, Number(itemQuantity.text)/Number(itemBags.text)/factor, 0);
+    }
+    table.setData(currentRow, 5, Number(table.data(currentRow, 1, 0)) * Number(table.data(currentRow, 3, 0)) * Number(table.data(currentRow, 4, 0)));
+    if(isDecaf.checked) {
+        table.setData(currentRow, 13, "true", 0);
+        table.setData(currentRow, 14, decafMethod.currentText, 0);
+    } else {
+        table.setData(currentRow, 13, "false", 0);
+    }
+    if(itemCertifications.model().rowCount() > 1) {
+        table.setData(currentRow, 6, itemCertifications.quotedColumnArray(0, 0), 0);
+    }
+    itemClear();
+});
+var newCancel = findChildObject(this, 'newCancel');
+newCancel.clicked.connect(function() {
+    pages.setCurrentIndex(0);
+});
+var newFee = findChildObject(this, 'newFee');
+newFee.clicked.connect(function() {
+    pages.setCurrentIndex(3);
+});
+var feeCancel = findChildObject(this, 'feeCancel');
+feeCancel.clicked.connect(function() {
+    clearFeePage();
+});
+var feeDescription = findChildObject(this, 'feeDescription');
+var feePrice = findChildObject(this, 'feePrice');
+var feeSave = findChildObject(this, 'feeSave');
+feeSave.clicked.connect(function() {
+    if(table.data(currentRow, 9, 0) == "NOP") {
+        table.setData(currentRow, 10, table.data(currentRow, 2, 0));
+        table.setData(currentRow, 11, table.data(currentRow, 5, 0));
+        table.setData(currentRow, 0, "UPDATE", 0);
+    } else {
+        table.setData(currentRow, 9, "INSERT", 0);
+    }
+    table.setData(currentRow, 2, feeDescription.text, 0);
+    table.setData(currentRow, 3, feePrice.text, 0);
+    table.setData(currentRow, 5, feePrice.text, 0);
+    table.setData(currentRow, 8, "FEE", 0);
+    clearFeePage();
+});
+function clearFeePage() {
+    feeDescription.text = "";
+    feePrice.text = "";
+    table.resizeColumnsToContents();
+    pages.setCurrentIndex(0);
+}
+function loadFeePage() {
+    feeDescription.text = table.data(currentRow, 2, 0);
+    feePrice.text = table.data(currentRow, 5, 0);
+    pages.setCurrentIndex(3);
+}
+var feeDelete = findChildObject(this, 'feeDelete');
+feeDelete.clicked.connect(function() {
+    if(table.data(currentRow, 9, 0) == "INSERT") {
+        table.removeRow(currentRow);
+    } else if(table.data(currentRow, 9, 0) == "UPDATE") {
+        table.setData(currentRow, 9, "DELETE", 0);
+        table.hideRow(currentRow);
+    } else if(table.data(currentRow, 9, 0) == "NOP") {
+        table.setData(currentRow, 9, "DELETE", 0);
+        table.hideRow(currentRow);
+    }
+    clearFeePage();
+});
+        ]]>
+    </program>
+</window>
