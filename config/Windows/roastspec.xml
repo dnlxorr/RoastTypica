@@ -98,25 +98,42 @@
                     notes.plainText = query.value(2);
                     if(query.value(3).length > 0) {
                         var spec = JSON.parse(query.value(3));
-                        if(spec.color.whole.expected === undefined) {
+                        if(spec.color === undefined) {
                             wholecolor.text = "";
-                        } else {
-                            wholecolor.text = spec.color.whole.expected;
-                        }
-                        if(spec.color.whole.tolerance === undefined) {
                             wholetolerance.text = "";
-                        } else {
-                            wholetolerance.text = spec.color.whole.tolerance;
-                        }
-                        if(spec.color.ground.expected === undefined) {
                             groundcolor.text = "";
-                        } else {
-                            groundcolor.text = spec.color.ground.expected;
-                        }
-                        if(spec.color.ground.tolerance === undefined) {
                             groundtolerance.text = "";
                         } else {
-                            groundtolerance.text = spec.color.ground.tolerance;
+                            if(spec.color.whole === undefined) {
+                                wholecolor.text = "";
+                                wholetolerance.text = "";
+                            } else {
+                                if(spec.color.whole.expected === undefined) {
+                                    wholecolor.text = "";
+                                } else {
+                                    wholecolor.text = spec.color.whole.expected;
+                                }
+                                if(spec.color.whole.tolerance === undefined) {
+                                    wholetolerance.text = "";
+                                } else {
+                                    wholetolerance.text = spec.color.whole.tolerance;
+                                }
+                            }
+                            if(spec.color.ground === undefined) {
+                                groundcolor.text = "";
+                                groundtolerance.text = "";
+                            } else {
+                                if(spec.color.ground.expected === undefined) {
+                                    groundcolor.text = "";
+                                } else {
+                                    groundcolor.text = spec.color.ground.expected;
+                                }
+                                if(spec.color.ground.tolerance === undefined) {
+                                    groundtolerance.text = "";
+                                } else {
+                                    groundtolerance.text = spec.color.ground.tolerance;
+                                }
+                            }
                         }
                     }
                 } else {
