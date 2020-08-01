@@ -467,12 +467,18 @@
 					for(var j = 0; j < device.channelCount(); j++) {
 						channels.push(device.getChannel(j));
 						columnNames.push(device.channelColumnName(j));
-						channelType.push("T");
+						channelType.push(device.channelType(j));
 						if(device.isChannelHidden(j)) {
 							channelVisibility.push(false);
 						} else {
 							channelVisibility.push(true);
 							var indicator = new TemperatureDisplay;
+							if(device.channelType(j) == "C")
+							{
+								indicator.setDisplayUnits(Units.Unitless);
+								indicator.digitCount = 5;
+								indicator.setDecimalPlaces(2);
+							}
 							temperatureDisplays.push(indicator);
 							var decorator = new WidgetDecorator(indicator, device.channelIndicatorText(j), 2);
 							device.getChannel(j).newData.connect(indicator.setValue);
@@ -606,6 +612,10 @@
 									calibrator.add_pair(Number(sourcevalues[k]),Number(destvalues[k]));
 								}
 								var indicator = new TemperatureDisplay;
+								if(channelType[j] == "C") {
+									indicator.setDisplayUnits(Units.Unitless);
+									indicator.setDecimalPlaces(2);
+								}
 								temperatureDisplays.push(indicator);
 								var decorator = new WidgetDecorator(indicator, configModel.data(driverIndex, 0), 2);
 								channels[j].newData.connect(calibrator.newMeasurement);
