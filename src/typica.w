@@ -689,12 +689,6 @@ template<> QTime getself(QScriptContext *context)
     return self;
 }
 
-template<> QModelIndex getself(QScriptContext *context)
-{
-    QModelIndex self = context->thisObject().toVariant().value<QModelIndex>();
-    return self;
-}
-
 template<> QByteArray getself(QScriptContext *context)
 {
     QByteArray self = context->thisObject().toVariant().toByteArray();
@@ -3516,19 +3510,11 @@ QScriptValue constructQTime(QScriptContext *context,
         {@t\1@>@/
             case 4:@/
                 arg4 = argument<int>(3, context);
-                arg3 = argument<int>(2, context);
-                arg2 = argument<int>(1, context);
-                arg1 = argument<int>(0, context);
-                break;
             case 3:@/
                 arg3 = argument<int>(2, context);
-                arg2 = argument<int>(1, context);
-                arg1 = argument<int>(0, context);
-                break;
             case 2:@/
                 arg2 = argument<int>(1, context);
                 arg1 = argument<int>(0, context);
-                break;
             default:@/
                 break;@t\2@>@/
         }
@@ -3867,15 +3853,10 @@ QScriptValue QTime_setHMS(QScriptContext *context, QScriptEngine *engine)
         {@t\1@>@/
             case 4:@/
                 arg4 = argument<int>(3, context);
-                arg3 = argument<int>(2, context);
-                arg2 = argument<int>(1, context);
-                arg1 = argument<int>(0, context);
-                break;
             case 3:@/
                 arg3 = argument<int>(2, context);
                 arg2 = argument<int>(1, context);
                 arg1 = argument<int>(0, context);
-                break;
             default:@/
                 break;@t\2@>@/
         }
@@ -4695,8 +4676,6 @@ void populateWidget(QDomElement element, QStack<QWidget *> *widgetStack,@|
                     QStack<QLayout *> *layoutStack);
 void populateStackedLayout(QDomElement element, QStack<QWidget *> *widgetStack,
                            QStack<QLayout *> *layoutStack);
-void populateFormLayout(QDomElement element, QStack<QWidget *> *widgetStack,@|
-                        QStack<QLayout *> *layoutStack);
 void addTemperatureDisplayToSplitter(QDomElement element,@|
                                      QStack<QWidget *> *widgetStack,
                                      QStack<QLayout *> *layoutStack);
@@ -5041,12 +5020,6 @@ else if(layoutType == "stack")
     layoutStack->push(layout);
     populateStackedLayout(element, widgetStack, layoutStack);
 }
-else if(layoutType == "form")
-{
-    layout = new QFormLayout;
-    layoutStack->push(layout);
-    populateFormLayout(element, widgetStack, layoutStack);
-}
 if(element.hasAttribute("id"))
 {
     layout->setObjectName(element.attribute("id"));
@@ -5059,47 +5032,6 @@ if(element.hasAttribute("margin"))
 {
     int m = element.attribute("margin").toInt();
     layout->setContentsMargins(m, m, m, m);
-}
-
-@ Any direct child of a form layout must be a {\tt <row>} element to specify
-the label for the given row. The field for the given row will always be a
-|QVBoxLayout| containing whatever is specified by children of the {\tt <row>}.
-
-@<Functions for scripting@>=
-void populateFormLayout(QDomElement element, QStack<QWidget *> *widgetStack,
-                        QStack<QLayout *> *layoutStack)
-{
-    QDomNodeList children = element.childNodes();
-    QFormLayout *layout = qobject_cast<QFormLayout *>(layoutStack->top());
-    for(int i = 0; i < children.count(); i++)
-    {
-        QDomNode current;
-        QDomElement currentElement;
-        current = children.at(i);
-        if(current.isElement())
-        {
-            currentElement = current.toElement();
-            if(currentElement.tagName() == "row")
-            {
-                QString label = QString();
-                if(currentElement.hasAttribute("label"))
-                {
-                    label = currentElement.attribute("label");
-                }
-                QVBoxLayout *childLayout = new QVBoxLayout;
-                layoutStack->push(childLayout);
-                populateBoxLayout(currentElement, widgetStack, layoutStack);
-                if(label.isEmpty())
-                {
-                    layout->addRow(childLayout);
-                }
-                else
-                {
-                    layout->addRow(label, childLayout);
-                }
-            }
-        }
-    }
 }
 
 @ Stacked layouts are a bit different from the other types. A stacked layout has
@@ -5728,7 +5660,7 @@ is an example of such a layout.
 
 When splitters are used as a way to hide optional features it sometimes has the
 effect of forcing a window to stay larger than should be required. To fix this,
-it is possible to set the \tt{ignoreSizePolicy} attribute to true. While this
+it is possible to set the {\tt ignoreSizePolicy} attribute to true. While this
 does solve the window size issue, this technique is inconsistent with generally
 expected behavior and its use should generally be discouraged.
 
@@ -6051,28 +5983,6 @@ void addSaltToLayout(QDomElement element, QStack<QWidget *> *,@|
     {
         view->setObjectName(element.attribute("id"));
     }
-    if(element.hasAttribute("editable"))
-    {
-        if(element.attribute("editable") == "false")
-        {
-            view->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        }
-    }
-    if(element.hasAttribute("selectionBehavior"))
-    {
-        if(element.attribute("selectionBehavior") == "items")
-        {
-            view->setSelectionBehavior(QAbstractItemView::SelectItems);
-        }
-        else if(element.attribute("selectionBehavior") == "rows")
-        {
-            view->setSelectionBehavior(QAbstractItemView::SelectRows);
-        }
-        else if(element.attribute("selectionBehavior") == "columns")
-        {
-            view->setSelectionBehavior(QAbstractItemView::SelectColumns);
-        }
-    }
     if(element.hasChildNodes())
     {
         QDomNodeList children = element.childNodes();
@@ -6165,13 +6075,6 @@ if(currentElement.hasAttribute("data"))
 if(currentElement.hasAttribute("display"))
 {
     widget->setDisplayColumn(currentElement.attribute("display").toInt());
-}
-if(currentElement.hasAttribute("editable"))
-{
-    if(currentElement.attribute("editable") == "true")
-    {
-        widget->setEditable(true);
-    }
 }
 widget->addSqlOptions(currentElement.text());
 delegate->setWidget(widget);
@@ -8283,12 +8186,19 @@ measured temperature.
 
 This is a specialization of |QLCDNumber|.
 
+With the addition of 4-20mA current channels, it no longer makes sense to
+restrict non-temperature measurements to whole number values. The default
+behavior is kept the same to avoid breaking old configurations, however new
+uses should explicitly set a desired number of decimal places for each
+indicator.
+
 @<Class declarations@>=
 class TemperatureDisplay : public QLCDNumber@/
 {@t\1@>@/
     Q_OBJECT@;
     int unit;
     bool r;
+	int decimalPlaces;
     public:@/
         TemperatureDisplay(QWidget *parent = NULL);
         ~TemperatureDisplay();@/
@@ -8296,7 +8206,8 @@ class TemperatureDisplay : public QLCDNumber@/
         void setValue(Measurement temperature);
         void invalidate();
         void setDisplayUnits(Units::Unit scale);
-        void setRelativeMode(bool relative);@t\2@>@/
+        void setRelativeMode(bool relative);
+		void setDecimalPlaces(int value);@t\2@>@/
 };
 
 @ Starting in version 1.6 this widget is also used for displaying a relative
@@ -8308,6 +8219,16 @@ conversions for absolute measures.
 void TemperatureDisplay::setRelativeMode(bool relative)
 {
     r = relative;
+}
+
+@ Starting in version 1.10 it is possible to override the default number of
+decimal places for different units on a per indicator basis. This allows more
+sensible handling of raw non-temperature measurements.
+
+@<TemperatureDisplay Implementation@>=
+void TemperatureDisplay::setDecimalPlaces(int value)
+{
+	decimalPlaces = value;
 }
 
 @ Displaying a temperature is a simple matter of taking the temperature
@@ -8330,15 +8251,15 @@ void TemperatureDisplay::setValue(Measurement temperature)
         case Units::Fahrenheit:
             display(QString("%1'F").
                 arg(number.setNum(temperature.toFahrenheit().temperature(), 'f',
-                                  2)));
+                                  (decimalPlaces == -1 ? 2 : decimalPlaces))));
             break;
         case Units::Celsius:
             if(!r) {
                 display(QString("%1'C").
                     arg(number.setNum(temperature.toCelsius().temperature(), 'f',
-                                    2)));
+                                    (decimalPlaces == -1 ? 2 : decimalPlaces))));
             } else {
-                number.setNum(temperature.temperature() * (5.0/9.0), 'f', 2);
+                number.setNum(temperature.temperature() * (5.0/9.0), 'f', (decimalPlaces == -1 ? 2 : decimalPlaces));
                 display(QString("%1'C").arg(number));
             }
             break;
@@ -8346,41 +8267,41 @@ void TemperatureDisplay::setValue(Measurement temperature)
             if(!r) {
                 display(QString("%1").
                     arg(number.setNum(temperature.toKelvin().temperature(), 'f',
-                                    2)));
+                                    (decimalPlaces == -1 ? 2 : decimalPlaces))));
             } else {
-                number.setNum(temperature.temperature() * (5.0/9.0), 'f', 2);
+                number.setNum(temperature.temperature() * (5.0/9.0), 'f', (decimalPlaces == -1 ? 2 : decimalPlaces));
                 display(QString("%1").arg(number));
             }
             break;
         case Units::Rankine:
             display(QString("%1'r").
                 arg(number.setNum(temperature.toRankine().temperature(), 'f',
-                                  2)));
+                                  (decimalPlaces == -1 ? 2 : decimalPlaces))));
             break;
         case Units::Unitless:
-            display(QString("%1").arg(number.setNum(temperature.temperature(), 'f', 0)));
+            display(QString("%1").arg(number.setNum(temperature.temperature(), 'f', (decimalPlaces == -1 ? 0 : decimalPlaces))));
             break;
         default:
             switch(temperature.scale())
             {
                 case Units::Fahrenheit:
                     display(QString("%1'F").
-                        arg(number.setNum(temperature.temperature(), 'f', 2)));
+                        arg(number.setNum(temperature.temperature(), 'f', (decimalPlaces == -1 ? 2 : decimalPlaces))));
                     break;
                 case Units::Celsius:
                     display(QString("%1'C").
-                        arg(number.setNum(temperature.temperature(), 'f', 2)));
+                        arg(number.setNum(temperature.temperature(), 'f', (decimalPlaces == -1 ? 2 : decimalPlaces))));
                     break;
                 case Units::Kelvin:
                     display(QString("%1").
-                        arg(number.setNum(temperature.temperature(), 'f', 2)));
+                        arg(number.setNum(temperature.temperature(), 'f', (decimalPlaces == -1 ? 2 : decimalPlaces))));
                     break;
                 case Units::Rankine:
                     display(QString("%1'r").
-                        arg(number.setNum(temperature.temperature(), 'f', 2)));
+                        arg(number.setNum(temperature.temperature(), 'f', (decimalPlaces == -1 ? 2 : decimalPlaces))));
                     break;
                 case Units::Unitless:
-                    display(QString("%1").arg(number.setNum(temperature.temperature(), 'f', 0)));
+                    display(QString("%1").arg(number.setNum(temperature.temperature(), 'f', (decimalPlaces == -1 ? 0 : decimalPlaces))));
                     break;
                 default:
 					qDebug() << "Warning: Attempting to convert a non-temperature unit to a temperature unit";
@@ -8400,9 +8321,13 @@ the usual |QLCDNumber| methods.
 \centerline{Figure \secno: Outline (Qt default) and Filled |QLCDNumber| Example}
 \medskip
 
+The default initialization of decimalPlaces to -1 is used to preserve unit
+specific defaults as seen above.
+
 @<TemperatureDisplay Implementation@>=
 TemperatureDisplay::TemperatureDisplay(QWidget *parent) :
-    QLCDNumber(8, parent), unit(Units::Fahrenheit), r(false)@/
+    QLCDNumber(8, parent), unit(Units::Fahrenheit), r(false),
+	decimalPlaces(-1)@/
 {
     setSegmentStyle(Filled);
     display("---.--'F");
@@ -13392,7 +13317,7 @@ class SaltModel : public QAbstractItemModel@/
     public:@/
         SaltModel(int columns);
         ~SaltModel();
-        Q_INVOKABLE int rowCount(const QModelIndex &parent = QModelIndex()) const;
+        int rowCount(const QModelIndex &parent = QModelIndex()) const;
         int columnCount(const QModelIndex &parent = QModelIndex()) const;
         bool setHeaderData(int section, Qt::Orientation@, orientation,
                            const QVariant &value, int role = Qt::DisplayRole);
@@ -13904,7 +13829,6 @@ SqlComboBox::SqlComboBox() :
     specialNullText(tr("Unknown")), specialNullData(QVariant::String)
 {
     view()->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    setMinimumContentsLength(20);
 }
 
 SqlComboBox::~SqlComboBox()
@@ -13952,12 +13876,7 @@ QWidget* SqlComboBoxDelegate::createEditor(QWidget *parent,@|
                                            const QStyleOptionViewItem &,
                                            const QModelIndex &) const
 {
-    SqlComboBox *retval = delegate->clone(parent);
-    if(delegate->isEditable())
-    {
-        retval->setEditable(true);
-    }
-    return retval;
+    return delegate->clone(parent);
 }
 
 @ To set the appropriate editor data, we check the value in the model and
@@ -13982,9 +13901,9 @@ void SqlComboBoxDelegate::setModelData(QWidget *editor,@|
                                        const QModelIndex &index) const
 {
     SqlComboBox *self = qobject_cast<SqlComboBox *>(editor);
-    model->setData(index, self->currentText(), Qt::DisplayRole);
     model->setData(index, self->itemData(self->currentIndex(), Qt::UserRole),
                    Qt::UserRole);
+    model->setData(index, self->currentText(), Qt::DisplayRole);
 }
 
 @ This is needed to play nicely with the model view architecture.
@@ -16466,13 +16385,11 @@ we declare that as a metatype.
 Q_DECLARE_METATYPE(QModelIndex)
 
 @ Next we need a pair of functions to convert |QModelIndex| to and from script
-values. Some |QModelIndex| methods are also exposed to the host environment.
+values.
 
 @<Function prototypes for scripting@>=
 QScriptValue QModelIndex_toScriptValue(QScriptEngine *engine, const QModelIndex &index);
 void QModelIndex_fromScriptValue(const QScriptValue &value, QModelIndex &index);
-void setQModelIndexProperties(QScriptValue value, QScriptEngine *engine);
-QScriptValue QModelIndex_row(QScriptContext *context, QScriptEngine *engine);
 
 @ These are implemented thusly.
 
@@ -16482,24 +16399,12 @@ QScriptValue QModelIndex_toScriptValue(QScriptEngine *engine, const QModelIndex 
     QVariant var;
     var.setValue(index);
     QScriptValue object = engine->newVariant(var);
-    setQModelIndexProperties(object, engine);
     return object;
 }
 
 void QModelIndex_fromScriptValue(const QScriptValue &value, QModelIndex &index)
 {
     index = value.toVariant().value<QModelIndex>();
-}
-
-void setQModelIndexProperties(QScriptValue value, QScriptEngine *engine)
-{
-    value.setProperty("row", engine->newFunction(QModelIndex_row));
-}
-
-QScriptValue QModelIndex_row(QScriptContext *context, QScriptEngine *engine)
-{
-    QModelIndex self = getself<QModelIndex>(context);
-    return QScriptValue(engine, self.row());
 }
 
 @ Finally we register this with the engine.
