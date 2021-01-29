@@ -28,6 +28,10 @@
 			</widget>
 		</splitter>
 	</layout>
+	<menu name="File">
+		<item id="save" shortcut="Ctrl+S">Save...</item>
+		<item id="export">Export CSV...</item>
+	</menu>
 	<menu name="Log">
 		<item id="showC">Display Celsius</item>
 		<item id="showF">Display Fahrenheit</item>
@@ -75,8 +79,11 @@
 			{
 				var buffer = new QBuffer(query.value(0));
 				var input = new XMLInput(buffer, 1);
+				log.clearOutputColumns();
 				input.newTemperatureColumn.connect(log.setHeaderData);
+				input.newTemperatureColumn.connect(log.addOutputTemperatureColumn);
 				input.newAnnotationColumn.connect(log.setHeaderData);
+				input.newAnnotationColumn.connect(log.addOutputAnnotationColumn);
 				input.measure.connect(graph.newMeasurement);
 				input.measure.connect(log.newMeasurement);
 				var lc;
@@ -132,6 +139,23 @@
 			log.setDisplayUnits(Units.Fahrenheit);
 			graph.showF();
 		});
+		var saveMenu = findChildObject(this, 'save');
+        saveMenu.triggered.connect(function() {
+            var filename = QFileDialog.getSaveFileName(window, TTR("basicWindow", "Save Log As..."), QSettings.value("script/lastDir", "") + "/");
+            if(filename != "") {
+                var file = new QFile(filename);
+                log.saveXML(file);
+                QSettings.setValue("script/lastDir", dir(filename));
+            }
+        });
+		var exportMenu = findChildObject(this, 'export');
+        exportMenu.triggered.connect(function() {
+            var filename = QFileDialog.getSaveFileName(window, TTR("basicWindow", "Export CSV As..."), QSettings.value("script/lastDir", "") + "/");
+            if(filename != "") {
+                log.saveCSV(file);
+                QSettings.setValue("script/lastDir", dir(filename));
+            }
+        });
 	]]>
 	</program>
 </window>
