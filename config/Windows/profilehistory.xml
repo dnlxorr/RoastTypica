@@ -116,19 +116,19 @@
 			displayProfile(profileList.data(row, 1));
 		});
 		var v1 = findChildObject(this, 'ms');
-        v1.triggered.connect(log.LOD_ms);
-        var v2 = findChildObject(this, '1s');
-        v2.triggered.connect(log.LOD_1s);
-        var v3 = findChildObject(this, '5s');
-        v3.triggered.connect(log.LOD_5s);
-        var v4 = findChildObject(this, '10s');
-        v4.triggered.connect(log.LOD_10s);
-        var v5 = findChildObject(this, '15s');
-        v5.triggered.connect(log.LOD_15s);
-        var v6 = findChildObject(this, '30s');
-        v6.triggered.connect(log.LOD_30s);
-        var v7 = findChildObject(this, '1m');
-        v7.triggered.connect(log.LOD_1m);
+		v1.triggered.connect(log.LOD_ms);
+		var v2 = findChildObject(this, '1s');
+		v2.triggered.connect(log.LOD_1s);
+		var v3 = findChildObject(this, '5s');
+		v3.triggered.connect(log.LOD_5s);
+		var v4 = findChildObject(this, '10s');
+		v4.triggered.connect(log.LOD_10s);
+		var v5 = findChildObject(this, '15s');
+		v5.triggered.connect(log.LOD_15s);
+		var v6 = findChildObject(this, '30s');
+		v6.triggered.connect(log.LOD_30s);
+		var v7 = findChildObject(this, '1m');
+		v7.triggered.connect(log.LOD_1m);
 		var showC = findChildObject(this, 'showC');
 		showC.triggered.connect(function() {
 			log.setDisplayUnits(Units.Celsius);
@@ -140,22 +140,23 @@
 			graph.showF();
 		});
 		var saveMenu = findChildObject(this, 'save');
-        saveMenu.triggered.connect(function() {
-            var filename = QFileDialog.getSaveFileName(window, TTR("basicWindow", "Save Log As..."), QSettings.value("script/lastDir", "") + "/");
-            if(filename != "") {
-                var file = new QFile(filename);
-                log.saveXML(file);
-                QSettings.setValue("script/lastDir", dir(filename));
-            }
-        });
+		saveMenu.triggered.connect(function() {
+			var filename = QFileDialog.getSaveFileName(window, TTR("basicWindow", "Save Log As..."), QSettings.value("script/lastDir", "") + "/");
+			if(filename != "") {
+				var file = new QFile(filename);
+				log.saveXML(file);
+				QSettings.setValue("script/lastDir", dir(filename));
+			}
+		});
 		var exportMenu = findChildObject(this, 'export');
-        exportMenu.triggered.connect(function() {
-            var filename = QFileDialog.getSaveFileName(window, TTR("basicWindow", "Export CSV As..."), QSettings.value("script/lastDir", "") + "/");
-            if(filename != "") {
-                log.saveCSV(file);
-                QSettings.setValue("script/lastDir", dir(filename));
-            }
-        });
+		exportMenu.triggered.connect(function() {
+			var filename = QFileDialog.getSaveFileName(window, TTR("basicWindow", "Export CSV As..."), QSettings.value("script/lastDir", "") + "/");
+			if(filename != "") {
+				var file = new QFile(filename);
+				log.saveCSV(file);
+				QSettings.setValue("script/lastDir", dir(filename));
+			}
+		});
 	]]>
 	</program>
 </window>
